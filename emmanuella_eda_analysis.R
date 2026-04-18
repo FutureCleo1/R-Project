@@ -18,7 +18,7 @@ library(ggplot2)
 # ---------------------------------------------------------
 
 # Load the final cleaned dataset from the project
-data21 <- read.csv("Master_2021_Cleaned.csv")
+data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
 
 # Quick check so I know the data loaded correctly
 head(data21)
