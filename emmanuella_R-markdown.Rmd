@@ -1,0 +1,181 @@
+---
+title: "CSC 308 Final Project - Individual Portfolio"
+author: "Emmanuella Obidike"
+date: "April 2026"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+# Introduction
+
+For this project, my role focused on data sourcing, exploratory data analysis (EDA), and interpretation.  
+I worked with the cleaned 2021 dataset to explore relationships between income, healthcare access, and health outcomes across selected states.
+
+The goal of my analysis was to understand how economic factors (like income) relate to healthcare quality and overall health rankings.
+
+---
+
+# Dataset and Preparation
+
+I used the cleaned dataset `Master_2021_Cleaned.csv`, which contains county-level data including:
+
+- Median household income  
+- Clinical care rankings  
+- Health factors and health outcomes rankings  
+- Demographic and health-related variables  
+
+To stay consistent with the project focus, I filtered the dataset to the following states:
+
+- Virginia  
+- North Carolina  
+- Maryland  
+- Georgia  
+- Florida  
+
+```{r}
+# Load dataset
+data21 <- read.csv("Master_2021_Cleaned.csv")
+
+# Filter selected states
+states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")
+
+filtered_data <- data21 %>%
+  filter(State %in% states)
+
+
+```
+
+---
+
+# Summary Statistics
+
+```{r}
+summary_table <- filtered_data %>%
+  group_by(State) %>%
+  summarise(
+    avg_income = mean(Median.Household.Income, na.rm = TRUE),
+    avg_clinical_rank = mean(Clinical_Care_Rank, na.rm = TRUE)
+  )
+
+summary_table
+```
+
+This provides a quick overview of differences between states.
+
+---
+
+# Visualization 1: Income vs Clinical Care
+
+```{r}
+ggplot(filtered_data, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
+  geom_point(color = "blue", alpha = 0.4) +
+  labs(
+    title = "Income vs Clinical Care (2021)",
+    x = "Median Household Income",
+    y = "Clinical Care Rank"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+This scatter plot shows a general downward trend.  
+As income increases, clinical care rank tends to improve (lower rank = better care).
+
+---
+
+# Visualization 2: Average Income by State
+
+```{r}
+ggplot(summary_table, aes(x = State, y = avg_income)) +
+  geom_col(fill = "purple") +
+  labs(
+    title = "Average Income by State (2021)",
+    x = "State",
+    y = "Average Income"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+Maryland has the highest average income, while Georgia and North Carolina are lower.
+
+---
+
+# Correlation: Income vs Clinical Care
+
+```{r}
+correlation <- cor(
+  filtered_data$Median.Household.Income,
+  filtered_data$Clinical_Care_Rank,
+  use = "complete.obs"
+)
+
+correlation
+```
+
+**Interpretation**
+
+The correlation is about -0.48, showing a moderate negative relationship.
+
+---
+
+# Visualization 3: Health Factors vs Health Outcomes
+
+```{r}
+ggplot(filtered_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
+  geom_point(alpha = 0.4, color = "darkgreen") +
+  labs(
+    title = "Health Factors vs Health Outcomes",
+    x = "Health Factors Rank",
+    y = "Health Outcomes Rank"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+There is a strong upward trend between health factors and outcomes.
+
+---
+
+# Correlation: Health Factors vs Outcomes
+
+```{r}
+correlation2 <- cor(
+  filtered_data$Health_Factors_Rank,
+  filtered_data$Health_Outcomes_Rank,
+  use = "complete.obs"
+)
+
+correlation2
+```
+
+**Interpretation**
+
+The correlation is about 0.91, which is very strong.
+
+---
+
+# Conclusion
+
+- Higher income is associated with improved clinical care rankings  
+- There are noticeable income differences across states  
+- Health factors strongly influence overall health outcomes    
+
+---
+
+# Individual Contribution (Emmanuella Obidike)
+
+- Loaded and filtered dataset  
+- Created summary tables  
+- Built visualizations  
+- Performed correlation analysis  
+- Interpreted results  
+
+All code in this document reflects my individual contribution.
