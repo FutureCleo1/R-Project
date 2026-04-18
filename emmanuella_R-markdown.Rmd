@@ -38,7 +38,7 @@ To stay consistent with the project focus, I filtered the dataset to the followi
 
 ```{r}
 # Load dataset
-data21 <- read.csv("Master_2021_Cleaned.csv")
+data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
 
 # Filter selected states
 states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")
