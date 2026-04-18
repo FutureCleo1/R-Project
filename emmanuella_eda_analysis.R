@@ -1,6 +1,7 @@
 # =========================================================
 # CSC 308 Organization of Programming Languages Final Project
 # Individual R Script
+# Project: Healthcare Access Trends (2021-2023)
 # Student: Emmanuella Obidike
 # Role: Data Sourcing, EDA Analysis, and Interpretation 
 # =========================================================
