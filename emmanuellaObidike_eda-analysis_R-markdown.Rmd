@@ -20,7 +20,7 @@ The dataset includes measures such as median household income, clinical care ran
 
 # Individual Contribution – Emmanuella Obidike
 
-**Role:** Data Sourcing, Exploratory Data Analysis (EDA), and Interpretation
+**Role:** Exploratory Data Analysis (EDA), Statistical Analysis, and Interpretation
 
 I was responsible for working with the cleaned 2021 dataset to explore relationships between income, clinical care, and health outcomes across selected states. My contribution focused on filtering the dataset, generating summary statistics, creating visualizations, and interpreting key patterns in the data.
 
@@ -148,7 +148,7 @@ ggplot(filtered_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
 
 **Interpretation**
 
-There is a strong upward trend between health factors and outcomes.
+This suggests that counties with poorer health factors tend to have worse health outcomes, indicating a strong relationship between environmental conditions and overall population health.
 
 ---
 
