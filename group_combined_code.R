@@ -1221,7 +1221,7 @@ print(correlation2)
 # -------------------------------
 # Chloe Washington - Implications of Results, Analytical Discussion, and Interpretation
 # -------------------------------
-This script supports my role in discussing what the project results mean
+# This script supports my role in discussing what the project results mean
 # and why those findings matter in a real-world healthcare context.
 
 library(dplyr)
