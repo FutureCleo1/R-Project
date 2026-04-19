@@ -10,14 +10,22 @@ library(dplyr)
 library(ggplot2)
 ```
 
-# Introduction
+# Project Overview
 
-For this project, my role focused on data sourcing, exploratory data analysis (EDA), and interpretation.  
-I worked with the cleaned 2021 dataset to explore relationships between income, healthcare access, and health outcomes across selected states.
+This project examines relationships between income, healthcare access, and health outcomes using county-level data. The analysis focuses on identifying patterns between economic factors and overall health rankings across selected states.
 
-The goal of my analysis was to understand how economic factors (like income) relate to healthcare quality and overall health rankings.
+The dataset includes measures such as median household income, clinical care rankings, and health factors/outcomes indicators. The goal of the project is to understand how socioeconomic conditions influence healthcare quality and population health.
 
 ---
+
+# Individual Contribution – Emmanuella Obidike
+
+**Role:** Data Sourcing, Exploratory Data Analysis (EDA), and Interpretation
+
+I was responsible for working with the cleaned 2021 dataset to explore relationships between income, clinical care, and health outcomes across selected states. My contribution focused on filtering the dataset, generating summary statistics, creating visualizations, and interpreting key patterns in the data.
+
+---
+
 
 # Dataset and Preparation
 
