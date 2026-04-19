@@ -27,6 +27,20 @@ I was responsible for working with the cleaned 2021 dataset to explore relations
 ---
 
 
+# Individual Contribution Summary
+
+This portfolio represents the individual work of Emmanuella Obidike.
+
+Primary responsibilities included:
+
+- Performing exploratory data analysis (EDA)
+- Generating summary statistics
+- Creating data visualizations using ggplot2
+- Conducting correlation analysis
+- Interpreting relationships between socioeconomic factors and healthcare access
+
+All analysis and code in this document reflect my individual contributions to the overall team project.
+
 # Dataset and Preparation
 
 I used the cleaned dataset `Master_2021_Cleaned.csv`, which contains county-level data including:
@@ -172,9 +186,13 @@ The correlation is about 0.91, which is very strong.
 
 # Conclusion
 
-- Higher income is associated with improved clinical care rankings  
-- There are noticeable income differences across states  
-- Health factors strongly influence overall health outcomes    
+The analysis reveals clear relationships between socioeconomic factors and healthcare access.
+
+Higher income levels are generally associated with better clinical care rankings, suggesting that economic stability plays a key role in access to healthcare resources. Also, strong relationships between health factors and health outcomes show that environmental and behavioral conditions significantly influence overall population health.
+
+Differences observed across states highlight how geographic and demographic variations contribute to disparities in healthcare access. These findings emphasize the importance of addressing socioeconomic inequalities in order to improve healthcare accessibility and outcomes.
+
+Overall, this project demonstrates how data visualization and exploratory analysis can transform complex healthcare data into insights that are more accessible and meaningful for a broader audience.    
 
 ---
 
