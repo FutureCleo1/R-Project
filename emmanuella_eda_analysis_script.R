@@ -6,7 +6,6 @@
 # Role: Data Sourcing, EDA Analysis, and Interpretation 
 # =========================================================
 
-# --- ORIGINAL CODE BY EMMANUELLA OBIDIKE ---
 # Using the cleaned dataset to do some additional EDA and
 # better understand patterns in the data.
 
