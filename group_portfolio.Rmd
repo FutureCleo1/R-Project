@@ -465,9 +465,79 @@ date: "April 2026"
 output: html_document
 ---
 
-This visualization explores the relationship between income and healthcare access. The results will show that lower income levels are associated with higher uninsured rates which portray that economic factors play a vital role in healthcare accessibility.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
+```
 
-This analysis supports the overall findings of the project because it shows how financial disparities influence health outcomes across different populations.
+---
+
+# Overview
+
+This section focuses on visualization and data presentation for the healthcare access disparities project. The goal of this analysis is to use graphical techniques to better understand how socioeconomic and geographic factors relate to healthcare access and outcomes across U.S. counties.
+
+---
+
+# Visualization 1: Income vs Uninsured Rate
+
+```{r}
+ggplot(data21, aes(x = Median.Household.Income, y = X..Uninsured)) +
+  geom_point(alpha = 0.5, color = "blue") +
+  labs(
+    title = "Income vs Uninsured Rate",
+    x = "Median Household Income",
+    y = "Uninsured Percentage"
+  ) +
+  theme_minimal()
+```
+
+---
+
+# Interpretation
+
+This visualization shows the relationship between median household income and the percentage of individuals who are uninsured. This pattern is sharing that counties with lower income level usually tend to have high uninsured rates which indicates that economic conditions play a vital role in access to healthcare coverage. 
+
+---
+
+# Visualization 2: Rural Population vs Clinical Care
+
+```{r}
+ggplot(data21, aes(x = X..Rural, y = Clinical_Care_Rank)) +
+  geom_point(alpha = 0.5, color = "red") +
+  labs(
+    title = "Rural Population vs Clinical Care",
+    x = "Rural Population (%)",
+    y = "Clinical Care Rank"
+  ) +
+  theme_minimal()
+```
+
+--- 
+
+# Interpretation
+
+This graph examines how rural population percentages compares to clinical care rankings. The results share that areas that have a higher rural population may experience low quality healthcare access, which is shown in poorer clinical care rankings. This proves geographic disparities in healthcare availability. 
+
+---
+
+# Interpretation of Findings
+
+The visualizations together, show that both georgraphic and economic factors can influence healthcare access. Communities with lower income levels and higher rural populations are linked with reduced access to healthcare services. These findings emphasize how important it is to address geographic and socioeconomic inequalities and they align with existing research on healthcare disparities. 
+
+---
+
+# Importance of Data Visualization
+
+Data visualization plays a major role in making complex datasets more simple and revealing patters that may not be obvious through numerical analysis. By utilizing graphical representations, others are able to better understand these disparities and make decisions to improve healthcare access and outcomes. 
+
+---
+
+# Conclusion
+
+Both of the presented visualizations show that location and income are key factors in influencing healthcare access. The use of Data visualization helps uncover these patterns and support the findings of this project. 
+
 
 ---
 title: "SidneyCerami_Validation_Markdown"
