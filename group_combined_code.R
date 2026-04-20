@@ -42,7 +42,7 @@ clean21_measures <- data21_measures %>%
   na.omit()
 
 # --- VERIFICATION STEP: Data Quality Check ---
-# This proves the N/A rows are gone
+
 print("Checking for missing values in 2021 Measures:")
 print(sum(is.na(clean21_measures))) # Should output 0
 
@@ -281,7 +281,7 @@ master_2021$Median.Household.Income <- as.numeric(as.character(master_2021$Media
 master_2021$Percent_Poor_Health     <- as.numeric(as.character(master_2021$Percent_Poor_Health))
 
 # 3. Force Racial Disparity Metrics (YPLL - Years of Potential Life Lost)
-# These replace Life Expectancy as primary demographic disparity proof
+# replace Life Expectancy as primary demographic disparity proof
 master_2021$YPLL_Rate  <- as.numeric(as.character(master_2021$YPLL_Rate))
 master_2021$YPLL_Black <- as.numeric(as.character(master_2021$YPLL_Black))
 master_2021$YPLL_White <- as.numeric(as.character(master_2021$YPLL_White))
@@ -295,241 +295,12 @@ print("Audit Successful. Verified Numeric Columns:")
 str(master_2021[c("YPLL_Black", "Health_Factors_Rank", "Median.Household.Income")])
 
 
-# --- C.  EDA PLOT: INCOME VS. CLINICAL CARE ---
-# Using the Full State Names found in the unique() check
-target_states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida") 
-
-plot_data_21 <- master_2021 %>% 
-  filter(State %in% target_states)
-
-ggplot(plot_data_21, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
-  # Alpha = 0.2 handles density; size = 1 keeps it clean
-  geom_point(alpha = 0.2, color = "midnightblue", size = 1) +
-  # Linear model trend line to answer Research Questions
-  geom_smooth(method = "lm", color = "red", se = FALSE) +
-  # Facet by State to solve overplotting and show regional differences
-  facet_wrap(~State, scales = "free_x") + 
-  # Formatting X-axis to "k" for professional clarity
-  scale_x_continuous(labels = function(x) paste0(x/1000, "k")) +
-  # Formatting Y-axis with specific breaks to stop side-number overlap
-  scale_y_continuous(breaks = seq(0, 200, by = 50)) + 
-  labs(title = "EDA: Healthcare Access Trends by State (2021)",
-       subtitle = "Relationship between Median Income and Clinical Care Ranking",
-       x = "Median Household Income ($k)",
-       y = "Clinical Care Rank (1 = Best)") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-    axis.text.y = element_text(size = 8),
-    strip.text = element_text(face = "bold") # Bold the State names for clarity
-  )
-
-# --- D. SAVE THE FINAL PLOT ---
-
-ggsave("2021_Socioeconomic_vs_Health_EDA.png", width = 10, height = 7, dpi = 300)
-
-# --- E. VERIFICATION ---
-print("2021 Master Processing Complete.")
-summary(master_2021$Clinical_Care_Rank)
-
-
-
-# --- F. EDA PLOT: RACIAL DISPARITY (PREMATURE MORTALITY) ---
-
-# 1. Prepare the data using the verified YPLL columns from master_2021
-
-racial_data_21 <- master_2021 %>%
-  filter(State %in% c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")) %>%
-  select(State, YPLL_Black, YPLL_White) %>%
-  # Pivoting the YPLL columns for side-by-side comparison
-  pivot_longer(cols = c(YPLL_Black, YPLL_White), 
-               names_to = "Race", 
-               values_to = "YPLL_Rate") %>%
-  na.omit()
-
-# 2. Generate the Boxplot
-# Note: In YPLL, a HIGHER bar means higher premature mortality
-ggplot(racial_data_21, aes(x = State, y = YPLL_Rate, fill = Race)) +
-  geom_boxplot(alpha = 0.7) +
-  # Use colors midnight blue and orange for contrast
-  scale_fill_manual(values = c("midnightblue", "darkorange"), 
-                    labels = c("Black population", "White population")) +
-  labs(title = "Regional Premature Mortality Disparities (2021)",
-       subtitle = "Comparison of Black and White Years of Potential Life Lost (YPLL)",
-       caption = "Data Source: County Health Rankings 2021",
-       x = "State",
-       y = "YPLL Rate (Years Lost per 100k)",
-       fill = "Demographic Group") +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    axis.text.x = element_text(face = "bold"),
-    plot.title = element_text(face = "bold", size = 14)
-  )
-
-# 3. Save image for report
-ggsave("2021_Racial_Disparity_YPLL_Plot.png", width = 10, height = 6)
-
-
-# --- G.  EDA PLOT: HEALTH OUTCOME VS HEALTH FACTOR  ---
-
-# 2. CREATE THE PLOT DATA: Filter for South Atlantic and remove NAs
-# creates the 'plot2_data' object that R is looking for to prevent error
-plot2_data <- master_2021 %>%
-  filter(State %in% c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")) %>%
-  filter(!is.na(Health_Factors_Rank) & !is.na(Health_Outcomes_Rank))
-
-# 3. GENERATE THE PLOT
-ggplot(plot2_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
-  #  geom_jitter to spread out dots so they don't overlap (width/height = 2)
-  geom_jitter(alpha = 0.4, color = "darkgreen", width = 2, height = 2) +
-  
-  # trend line to show the relationship between factors and outcomes
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE) +
-  
-  # CLEAN THE AXES:breaks so the numbers aren't crowded
-  scale_y_continuous(breaks = seq(0, 150, by = 50)) + 
-  scale_x_continuous(breaks = seq(0, 150, by = 50)) +
-  
-  # Separate by state for regional comparison
-  facet_wrap(~State) + 
-  
-  labs(title = "Predictors vs. Current Health Outcomes (2021)",
-       subtitle = "Relationship between Health Factors and Current County Rankings",
-       x = "Health Factors Rank (1 = Best Environment)",
-       y = "Health Outcomes Rank (1 = Best Health)") +
-  theme_light() +
-  theme(
-    strip.text = element_text(face = "bold", size = 10),
-    axis.title = element_text(size = 10),
-    panel.grid.minor = element_blank()
-  )
-
-# 4. Save the image for report
-ggsave("2021_Outcomes_vs_Factors_.png", width = 10, height = 7)
-
-
-# --- H. OUTCOMES VS. FACTORS (ALL STATES) ---
-
-
-
-
-# 2. DATA QUALITY: 
-# Removing NAs ensures the red trend line can be calculated correctly
-all_states_plot_data <- master_2021 %>%
-  filter(!is.na(Health_Factors_Rank) & !is.na(Health_Outcomes_Rank))
-
-# 3. GENERATE THE COMPREHENSIVE PLOT
-ggplot(all_states_plot_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
-  # smaller 'size' and 'alpha' because there are thousands of counties
-  # geom_jitter  so you data can be seen through the clusters
-  geom_jitter(alpha = 0.2, color = "darkgreen", size = 0.5, width = 1.5, height = 1.5) +
-  
-  # red trend line to show the overall national/state relationship
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE, size = 0.5) +
-  
-  # CLEAN THE AXES: Use 100-unit breaks to keep the labels from overlapping
-  scale_y_continuous(breaks = seq(0, 300, by = 100)) + 
-  scale_x_continuous(breaks = seq(0, 300, by = 100)) +
-  
-  # Facet by State
-  facet_wrap(~State) + 
-  
-  labs(title = "National Health Predictors vs. Outcomes (2021)",
-       subtitle = "Relationship between Health Factors and Current County Rankings across All States",
-       x = "Health Factors Rank (1 = Best)",
-       y = "Health Outcomes Rank (1 = Best)") +
-  
-  # THEME: Shrink the text sizes so the 50 labels fit on one screen
-  theme_light() +
-  theme(
-    strip.text = element_text(size = 6, face = "bold"), # Smaller state labels
-    axis.text = element_text(size = 5),                # Smaller axis numbers
-    axis.title = element_text(size = 8),
-    panel.grid.minor = element_blank()
-  )
-
-# 4. Save the high-resolution version 
-ggsave("2021_National_Outcomes_vs_Factors.png", width = 20, height = 15, dpi = 300)
-
-# ---------------------------------------------------------
-# STEP 3: 2021 ANALYTICAL BASELINE & SUMMARY
-# ---------------------------------------------------------
-
-library(dplyr)
-
-# --- A. Mathematical Correlation Proofs ---
-
-# 1. Income vs. Health Rank
-cor_income_health <- cor.test(master_2021$Median.Household.Income, 
-                              master_2021$Clinical_Care_Rank, 
-                              use = "complete.obs")
-
-# 2. Health Factors vs. Health Outcomes 
-# Proves if environmental factors (income/smoking) actually predict current health
-cor_factors_outcomes <- cor.test(master_2021$Health_Factors_Rank, 
-                                 master_2021$Health_Outcomes_Rank, 
-                                 use = "complete.obs")
-
-# 3. Racial Disparity Correlation (Black vs. White YPLL)
-# Measures how closely the premature mortality rates of both groups move together
-cor_racial_ypll <- cor.test(master_2021$YPLL_Black, 
-                            master_2021$YPLL_White, 
-                            use = "complete.obs")
-
-# --- B. Create a Combined Statistical Coefficient Table ---
-
-cor_results_2021 <- data.frame(
-  Analysis_Type = c("Income vs Clinical Care", "Factors vs Outcomes", "Black vs White YPLL"),
-  Correlation_Coefficient = c(cor_income_health$estimate, 
-                              cor_factors_outcomes$estimate, 
-                              cor_racial_ypll$estimate),
-  P_Value = c(cor_income_health$p.value, 
-              cor_factors_outcomes$p.value, 
-              cor_racial_ypll$p.value),
-  Year = 2021
-)
-
-write.csv(cor_results_2021, "2021_Statistical_Proofs.csv", row.names = FALSE)
-
-
-# --- C. Regional Summary Table (South Atlantic) ---
-
-summary_2021 <- master_2021 %>%
-  # Filter for your specific South Atlantic focus
-  filter(State %in% c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")) %>%
-  group_by(State) %>%
-  summarise(
-    Avg_Income_21 = round(mean(Median.Household.Income, na.rm = TRUE), 0),
-    Avg_Health_Rank_21 = round(mean(Clinical_Care_Rank, na.rm = TRUE), 1),
-    
-    # Premature Mortality Metrics
-    Avg_YPLL_Black_21 = round(mean(YPLL_Black, na.rm = TRUE), 0),
-    Avg_YPLL_White_21 = round(mean(YPLL_White, na.rm = TRUE), 0),
-    
-    # The Disparity Gap Calculation
-    YPLL_Disparity_Gap_21 = round(mean(YPLL_Black, na.rm = TRUE) - mean(YPLL_White, na.rm = TRUE), 0),
-    
-    Total_Counties = n()
-  ) %>%
-  # Sort by State name for a clean, organized table
-  arrange(State)
-
-# Save the file with your preferred name
-write.csv(summary_2021, "Summary_Baseline_2021.csv", row.names = FALSE)
-
-# --- D. Final Verification ---
-print("--- 2021 STATISTICAL PROOFS ---")
-print(cor_results_2021)
-print("--- 2021 REGIONAL SUMMARY ---")
-print(summary_2021)
-
 # --- C. Final 2021 Audit ---
-# Proving 'Data Quality' by checking for any remaining NAs in master file
+# Proving Data Quality by checking for any remaining NAs in master file
 print("Final NA check for 2021 Master:")
 print(sum(is.na(master_2021)))
 
-# Exporting a CSV version of your Master File to  folder 
+# Exporting a CSV version of Master File to folder 
 write.csv(master_2021, "Master_2021_Cleaned.csv", row.names = FALSE)
 
 
@@ -552,12 +323,12 @@ data22_measures <- read.csv("raw_data/2022/Additional Measure Data.csv",
 head(data22_measures)
 
 names(data22_measures)  # Lists every column name in the console
-View(data22_measures)   # Opens the data in a spreadsheet tab at the top
+View(data22_measures)   # shows data in another tab
 
 # Creating the clean 2022 dataset
 clean22_measures <- data22_measures %>%
-  # 1. Select and Rename based on the headers you found
-  # Format: New_Name = Old_Heading_From_CSV
+  # Select and Rename based on the headers
+  
   select(
     FIPS, 
     State,
@@ -568,23 +339,23 @@ clean22_measures <- data22_measures %>%
     Life_Exp_22 = Life.Expectancy
   ) %>%
   
-  # 2. Basic Cleaning: Remove rows where County is empty 
-  # This keeps the dataset whole but removes the non-county summary rows
+  #  Basic Cleaning: Remove rows where County is empty 
+  
   filter(County != "")
 
-# View the result to ensure it's exactly what you need
+# View the results
 View(clean22_measures)
 
 write.csv(clean22_measures, "clean22_measures.csv", row.names = FALSE)
 
 # --- FILE 2: Additional Measure Sources and Years ---
 
-# 1. Read the 2022 raw metadata
+#  Read the 2022 raw metadata
 data22_metadata <- read.csv("raw_data/2022/Addtl Measure Sources and Years.csv", 
                             skip = 0, 
                             na.strings = c("N/A", "", " "))
 
-# 2. Clean and Rename
+#  Clean and Rename
 clean22_metadata <- data22_metadata %>%
   dplyr::select(
     Category    = Focus.Area,
@@ -596,7 +367,7 @@ clean22_metadata <- data22_metadata %>%
   # Filter out empty rows or section headers
   filter(!is.na(Measure) & Measure != "")
 
-# 3. Verification
+#  Verification
 print("2022 Metadata Successfully Cleaned!")
 head(clean22_metadata)
 
@@ -606,13 +377,13 @@ write.csv(clean22_metadata, "clean22_metadata.csv", row.names = FALSE)
 
 # --- FILE 3: Outcomes and Factors Rankings ---
 
-# 1. Read the 2022 file
+#  Read the 2022 file
 
 data22_ranked <- read.csv("raw_data/2022/Outcomes and Factors Rankings.csv", 
                           skip = 1, 
                           na.strings = c("N/A", "", " "))
 
-# 2. Clean and Rename
+#  Clean and Rename
 clean22_ranked <- data22_ranked %>%
   dplyr::select(
     FIPS, 
@@ -622,28 +393,28 @@ clean22_ranked <- data22_ranked %>%
     Health_Outcomes_Rank = Rank,
     Health_Factors_Rank = Rank.1
   ) %>%
-  # Keep only actual counties (removes State/National summary rows)
+  # Keep only actual counties
   filter(County != "") %>% 
   # Drop N/As for counties that weren't ranked
   na.omit()
 
-# 3. Verification
+#  Verification
 print("--- 2022 RANKINGS CLEANED ---")
 print(paste("Number of Ranked Counties:", nrow(clean22_ranked)))
 head(clean22_ranked)
 
 View(clean22_ranked)
-# 4. Save to Console (Quick Save)
+# 4. Save to Console 
 write.csv(clean22_ranked, "clean22_ranked.csv", row.names = FALSE)
 
 # --- FILE 4: Outcomes and Factors SubRankings ---
 
-# 1. Read the 2022 SubRankings file
+#  Read the 2022 SubRankings file
 data22_subranked <- read.csv("raw_data/2022/Outcomes and Factors SubRankings.csv", 
                              skip = 1, 
                              na.strings = c("N/A", "", " "))
 
-# 2. Clean and Rename
+#  Clean and Rename
 clean22_subranked <- data22_subranked %>%
   dplyr::select(
     FIPS, 
@@ -655,29 +426,29 @@ clean22_subranked <- data22_subranked %>%
   ) %>%
   # Remove state-level summary rows
   filter(County != "") %>%
-  # Remove unranked counties to keep data tight
+  # Remove unranked counties 
   na.omit()
 
-# 3. Verification
+# Verification
 
 head(clean22_subranked)
 
-# 4. SAVE FILE
+#  SAVE FILE
 write.csv(clean22_subranked, "clean22_subranked.csv", row.names = FALSE)
 
 # --- FILE 5: Ranked Measure Data ---
 
-# 1. Read the 2022 Ranked Measure file
+# read 2022 file
 data22_rankedmeasures <- read.csv("raw_data/2022/Ranked Measure Data.csv", 
                                   skip = 1, 
                                   na.strings = c("N/A", "", " "))
 
-# 2. Clean and Rename
+ Clean and Rename
 clean22_rankedmeasures <- data22_rankedmeasures %>%
   dplyr::select(
     FIPS, State, County,
     YPLL_Rate = Years.of.Potential.Life.Lost.Rate,
-    # Note the period at the end of Black. and the lowercase white.
+   
     YPLL_Black = YPLL.Rate..Black.,
     YPLL_White = YPLL.Rate..white., 
     Percent_Poor_Health = X..Fair.or.Poor.Health,
@@ -687,21 +458,21 @@ clean22_rankedmeasures <- data22_rankedmeasures %>%
   # Keep counties with a primary YPLL rate
   filter(!is.na(YPLL_Rate))
 
-# 3. Verification
+#  Verification
 print("--- 2022 RANKED MEASURES CLEANED ---")
 print(paste("Rows available for YPLL analysis:", nrow(clean22_rankedmeasures)))
 
-# 4. SAVE FILE
+#  SAVE FILE
 write.csv(clean22_rankedmeasures, "clean22_rankedmeasures.csv", row.names = FALSE)
 
 # --- FILE 6: Ranked Measure Sources and Years ---
 
-# 1. Read the 2022 metadata file
+#  Read the 2022 metadata file
 metadata22 <- read.csv("raw_data/2022/Ranked Measure Sources and Years.csv", 
                        skip = 0, 
                        na.strings = c("N/A", "", " "))
 
-# 2. Clean and Rename
+#  Clean and Rename
 
 clean22_metadata_ranked <- metadata22 %>%
   dplyr::select(
@@ -714,29 +485,29 @@ clean22_metadata_ranked <- metadata22 %>%
   # Filter out empty rows to keep the dictionary clean
   filter(!is.na(Measure) & Measure != "")
 
-# 3. Verification
+#  Verification
 print("--- 2022 RANKED METADATA CLEANED ---")
 head(clean22_metadata_ranked)
 
-# 4. SAVE FILE 
+#  SAVE FILE 
 write.csv(clean22_metadata_ranked, "metadata22.csv", row.names = FALSE)
 
 # ---------------------------------------------------------
 # STEP 2 (2022): INTEGRATING 2022 DATA
 # ---------------------------------------------------------
 
-# 1. Join all 2022 files strictly by FIPS 
+#  Join all 2022 files strictly by FIPS 
 master_2022 <- clean22_measures %>%
   inner_join(clean22_ranked, by = "FIPS") %>%
   inner_join(clean22_subranked, by = "FIPS") %>%
   inner_join(clean22_rankedmeasures, by = "FIPS")
 
-# 2. Cleanup: Standardize names and remove the .x/.y duplicates
+# Cleanup: Standardize names and remove the .x/.y duplicates
 master_2022 <- master_2022 %>%
   rename(State = State.x, County = County.x) %>%
   select(-ends_with(".y"), -ends_with(".x.x"), -ends_with(".y.y"))
 
-# 3. Final Check for Join Success
+#  Final Check for Join Success
 print("--- MASTER 2022 SUCCESSFULLY ESTABLISHED ---")
 print(paste("Final 2022 Row Count:", nrow(master_2022)))
 
@@ -745,194 +516,30 @@ print(paste("Final 2022 Row Count:", nrow(master_2022)))
 # ---------------------------------------------------------
 
 
-# 1. Force Rankings and Outcomes to Numeric
+#  Force Rankings and Outcomes to Numeric
 master_2022$Health_Factors_Rank  <- as.numeric(as.character(master_2022$Health_Factors_Rank))
 master_2022$Health_Outcomes_Rank <- as.numeric(as.character(master_2022$Health_Outcomes_Rank))
 master_2022$Clinical_Care_Rank   <- as.numeric(as.character(master_2022$Clinical_Care_Rank))
 master_2022$Socioeconomic_Rank   <- as.numeric(as.character(master_2022$Socioeconomic_Rank))
 
-# 2. Force Economic and Quality of Life Measures
+#  Force Economic and Quality of Life Measures
 master_2022$Median.Household.Income <- as.numeric(as.character(master_2022$Median.Household.Income))
 master_2022$Percent_Poor_Health     <- as.numeric(as.character(master_2022$Percent_Poor_Health))
 
-# 3. Force Racial Disparity Metrics (YPLL)
+#  Force Racial Disparity Metrics (YPLL)
 master_2022$YPLL_Rate  <- as.numeric(as.character(master_2022$YPLL_Rate))
 master_2022$YPLL_Black <- as.numeric(as.character(master_2022$YPLL_Black))
 master_2022$YPLL_White <- as.numeric(as.character(master_2022$YPLL_White))
 
-# 4. PREPROCESSING
+#  PREPROCESSING
 master_2022 <- na.omit(master_2022)
 
-# 5. VERIFICATION
+#  VERIFICATION
 print("2022 Audit Successful. Verified Numeric Columns:")
 str(master_2022[c("YPLL_Black", "Health_Factors_Rank", "Median.Household.Income")])
 
-# 6. SAVE THE MASTER
+#  SAVE THE MASTER
 write.csv(master_2022, "Master_2022_Final.csv", row.names = FALSE)
-
-
-
-# --- C. EDA PLOT (2022): INCOME VS. CLINICAL CARE ---
-target_states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida") 
-
-plot_data_22 <- master_2022 %>% 
-  filter(State %in% target_states)
-
-ggplot(plot_data_22, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
-  geom_point(alpha = 0.2, color = "midnightblue", size = 1) +
-  geom_smooth(method = "lm", color = "red", se = FALSE) +
-  facet_wrap(~State, scales = "free_x") + 
-  scale_x_continuous(labels = function(x) paste0(x/1000, "k")) +
-  scale_y_continuous(breaks = seq(0, 200, by = 50)) + 
-  labs(title = "EDA: Healthcare Access Trends by State (2022)",
-       subtitle = "Relationship between Median Income and Clinical Care Ranking",
-       x = "Median Household Income ($k)",
-       y = "Clinical Care Rank (1 = Best)") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-    axis.text.y = element_text(size = 8),
-    strip.text = element_text(face = "bold")
-  )
-
-ggsave("2022_Socioeconomic_vs_Health_EDA.png", width = 10, height = 7, dpi = 300)
-
-# --- F. EDA PLOT (2022): RACIAL DISPARITY ---
-racial_data_22 <- master_2022 %>%
-  filter(State %in% target_states) %>%
-  select(State, YPLL_Black, YPLL_White) %>%
-  pivot_longer(cols = c(YPLL_Black, YPLL_White), 
-               names_to = "Race", 
-               values_to = "YPLL_Rate") %>%
-  na.omit()
-
-ggplot(racial_data_22, aes(x = State, y = YPLL_Rate, fill = Race)) +
-  geom_boxplot(alpha = 0.7) +
-  scale_fill_manual(values = c("midnightblue", "darkorange"), 
-                    labels = c("Black population", "White population")) +
-  labs(title = "Regional Premature Mortality Disparities (2022)",
-       subtitle = "Comparison of Black and White Years of Potential Life Lost (YPLL)",
-       caption = "Data Source: County Health Rankings 2022",
-       x = "State",
-       y = "YPLL Rate (Years Lost per 100k)",
-       fill = "Demographic Group") +
-  theme_minimal() +
-  theme(legend.position = "bottom", axis.text.x = element_text(face = "bold"))
-
-ggsave("2022_Racial_Disparity_YPLL_Plot.png", width = 10, height = 6)
-
-# --- G.  EDA PLOT: HEALTH OUTCOME VS HEALTH FACTOR  ---
-
-# 1. CREATE THE PLOT DATA: Filter for South Atlantic and remove NAs
-plot2_data_22 <- master_2022 %>%
-  filter(State %in% c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")) %>%
-  filter(!is.na(Health_Factors_Rank) & !is.na(Health_Outcomes_Rank))
-
-# 2. GENERATE THE PLOT
-ggplot(plot2_data_22, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
-  # Using jitter to prevent point-stacking
-  geom_jitter(alpha = 0.4, color = "darkgreen", width = 2, height = 2) +
-  
-  # Trend line to show the 2022 relationship
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE) +
-  
-  # Clean axes
-  scale_y_continuous(breaks = seq(0, 150, by = 50)) + 
-  scale_x_continuous(breaks = seq(0, 150, by = 50)) +
-  
-  # Separate by state
-  facet_wrap(~State) + 
-  
-  labs(title = "Predictors vs. Current Health Outcomes (2022)",
-       subtitle = "Relationship between Health Factors and Current County Rankings",
-       x = "Health Factors Rank (1 = Best Environment)",
-       y = "Health Outcomes Rank (1 = Best Health)") +
-  theme_light() +
-  theme(
-    strip.text = element_text(face = "bold", size = 10),
-    axis.title = element_text(size = 10),
-    panel.grid.minor = element_blank()
-  )
-
-# 3. Save the image
-ggsave("2022_Outcomes_vs_Factors_Regional.png", width = 10, height = 7)
-
-
-# --- H.  EDA PLOT: HEALTH OUTCOME VS HEALTH FACTOR (ALL STATES)  ---
-
-# 1. DATA QUALITY: Remove NAs for the national trend
-all_states_22_plot_data <- master_2022 %>%
-  filter(!is.na(Health_Factors_Rank) & !is.na(Health_Outcomes_Rank))
-
-# 2. GENERATE THE COMPREHENSIVE PLOT
-ggplot(all_states_22_plot_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
-  # Micro-jitter for thousands of data points
-  geom_jitter(alpha = 0.2, color = "darkgreen", size = 0.5, width = 1.5, height = 1.5) +
-  
-  # National trend line
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE, size = 0.5) +
-  
-  # 100-unit breaks for the larger national scale
-  scale_y_continuous(breaks = seq(0, 300, by = 100)) + 
-  scale_x_continuous(breaks = seq(0, 300, by = 100)) +
-  
-  # Facet by State (all 50)
-  facet_wrap(~State) + 
-  
-  labs(title = "National Health Predictors vs. Outcomes (2022)",
-       subtitle = "Relationship between Health Factors and Current County Rankings across All States",
-       x = "Health Factors Rank (1 = Best)",
-       y = "Health Outcomes Rank (1 = Best)") +
-  
-  theme_light() +
-  theme(
-    strip.text = element_text(size = 6, face = "bold"), 
-    axis.text = element_text(size = 5),                
-    axis.title = element_text(size = 8),
-    panel.grid.minor = element_blank()
-  )
-
-# 3. Save high-res version (wider for 50 states)
-ggsave("2022_National_Outcomes_vs_Factors.png", width = 20, height = 15, dpi = 300)
-
-
-
-# ---------------------------------------------------------
-# STEP 3: 2022 ANALYTICAL BASELINE & SUMMARY
-# ---------------------------------------------------------
-
-
-
-# 1. Correlation Proofs
-cor_income_health_22 <- cor.test(master_2022$Median.Household.Income, master_2022$Clinical_Care_Rank, use = "complete.obs")
-cor_factors_outcomes_22 <- cor.test(master_2022$Health_Factors_Rank, master_2022$Health_Outcomes_Rank, use = "complete.obs")
-cor_racial_ypll_22 <- cor.test(master_2022$YPLL_Black, master_2022$YPLL_White, use = "complete.obs")
-
-# 2. Combined Coefficient Table
-cor_results_2022 <- data.frame(
-  Analysis_Type = c("Income vs Clinical Care", "Factors vs Outcomes", "Black vs White YPLL"),
-  Correlation_Coefficient = c(cor_income_health_22$estimate, cor_factors_outcomes_22$estimate, cor_racial_ypll_22$estimate),
-  P_Value = c(cor_income_health_22$p.value, cor_factors_outcomes_22$p.value, cor_racial_ypll_22$p.value),
-  Year = 2022
-)
-
-write.csv(cor_results_2022, "2022_Statistical_Proofs.csv", row.names = FALSE)
-
-# 3. Regional Summary Table
-summary_2022 <- master_2022 %>%
-  filter(State %in% target_states) %>%
-  group_by(State) %>%
-  summarise(
-    Avg_Income_22 = round(mean(Median.Household.Income, na.rm = TRUE), 0),
-    Avg_Health_Rank_22 = round(mean(Clinical_Care_Rank, na.rm = TRUE), 1),
-    Avg_YPLL_Black_22 = round(mean(YPLL_Black, na.rm = TRUE), 0),
-    Avg_YPLL_White_22 = round(mean(YPLL_White, na.rm = TRUE), 0),
-    YPLL_Disparity_Gap_22 = round(mean(YPLL_Black, na.rm = TRUE) - mean(YPLL_White, na.rm = TRUE), 0),
-    Total_Counties = n()
-  ) %>%
-  arrange(State)
-
-write.csv(summary_2022, "Summary_Baseline_2022.csv", row.names = FALSE)
 
 
 
@@ -940,8 +547,14 @@ write.csv(summary_2022, "Summary_Baseline_2022.csv", row.names = FALSE)
 # SECTION: 2023 DATA PREPARATION AND ANALYSIS
 # =========================================================
 
-
 library(dplyr)
+
+# ---------------------------------------------------------
+# STEP 1: PROCESSING AND CLEANING 2023 DATA
+# ---------------------------------------------------------
+
+
+
 
 # --- FILE 1: Additional Measure Data ---
 data23_measures_raw <- read.csv("raw_data/2023/Additional Measure Data.csv", 
@@ -1044,9 +657,9 @@ master_2023 <- clean23_measures %>%
   inner_join(clean23_subranked, by = "FIPS") %>%
   inner_join(clean23_rankedmeasures, by = "FIPS")
 
-# 2. Standardize names and remove the .x/.y duplicates
+#  Standardize names and remove the .x/.y duplicates
 master_2023 <- master_2023 %>%
-  # Rename the multiple matches from the Join to our standard names
+  # Rename the multiple matches from the Join to standard names
   rename(
     State = State.x, 
     County = County.x,
@@ -1058,7 +671,7 @@ master_2023 <- master_2023 %>%
          -contains("Black2"), -contains("Black3"), -contains("Black4"),
          -contains("White2"), -contains("White3"), -contains("White4"))
 
-# 3. Final Check for Join success
+# Final Check for Join success
 print("--- MASTER 2023 SUCCESSFULLY ESTABLISHED ---")
 print(paste("Final 2023 Row Count:", nrow(master_2023)))
 
@@ -1089,7 +702,7 @@ master_2023 <- na.omit(master_2023)
 print("2023 Audit Successful. Verified Numeric Columns:")
 str(master_2023[c("YPLL_Black", "Health_Factors_Rank", "Median.Household.Income")])
 
-# 6. SAVE THE MASTER TO CONSOLE/PROJECT FOLDER
+# 6. SAVE THE MASTER 
 write.csv(master_2023, "Master_2023_Final.csv", row.names = FALSE)
 
 
