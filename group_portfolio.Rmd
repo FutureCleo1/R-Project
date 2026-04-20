@@ -3,34 +3,28 @@ Name: Mady Boyd, Emmanuella Obidike, Chloe Washington, Sidney Cerami, Joshua Hal
 title: "R Notebook"
 output: html_notebook
 ---
+
 Access to healthcare is not the same for everyone. Differences often depend on income, where people live, and demographic factors. Although healthcare data is widely available, it can be hard to understand without proper analysis and visualization. Because of this difficulty, people are not able to clearly see where the gaps and differences in access to healthcare exist and what factors could be the potential causes for those gaps. The purpose of this project is to use a form of data analysis and visualization to break down and understand patterns regarding healthcare access and point out those disparities across different demographics and populations. With this project, complex healthcare data will be easier to interpret and understand for people like students, researchers, and all.
 
-This project aims to explore healthcare access disparities through a data-focused and visualization-centered approach using the R programming language. By analyzing measurable factors such as income, insurance coverage, geographic location, and demographic characteristics, the project seeks to make complex healthcare data more accessible and understandable to students, researchers, and other stakeholders.
----
-title: "CSC 308 Final Project - Individual Portfolio"
-author: "Mady"
-date: "April 2026"
-output: html_document
----
-#Project Overview
+This project aims to explore healthcare access disparities through a data-focused and visualization-centered approach using the R programming language. By analyzing measurable factors such as income, insurance coverage, geographic location, and demographic characteristics, the project seeks to make complex healthcare data more accessible and understandable to students, researchers, and other stakeholders. 31b8e172-b470-440e-83d8-e6b185028602:dAB5AHAAZQA6AFoAUQBBAHgAQQBEAGcAQQBNAFEAQQA1AEEARABZAEEATQBBAEEAMQBBAEMAMABBAE0AQQBCAGgAQQBHAE0AQQBaAEEAQQB0AEEARABRAEEAWgBnAEIAaABBAEcAVQBBAEwAUQBBADQAQQBHAEkAQQBPAFEAQQA1AEEAQwAwAEEATwBRAEIAagBBAEQARQBBAFkAZwBBADMAQQBHAEkAQQBaAEEAQQAzAEEARwBNAEEATQBBAEIAbQBBAEQARQBBAAoAcABvAHMAaQB0AGkAbwBuADoATQBRAEEAegBBAEQATQBBAE4AdwBBAD0ACgBwAHIAZQBmAGkAeAA6AAoAcwBvAHUAcgBjAGUAOgBMAFEAQQB0AEEAQwAwAEEAQwBnAEIAMABBAEcAawBBAGQAQQBCAHMAQQBHAFUAQQBPAGcAQQBnAEEAQwBJAEEAUQB3AEIAVABBAEUATQBBAEkAQQBBAHoAQQBEAEEAQQBPAEEAQQBnAEEARQBZAEEAYQBRAEIAdQBBAEcARQBBAGIAQQBBAGcAQQBGAEEAQQBjAGcAQgB2AEEARwBvAEEAWgBRAEIAagBBAEgAUQBBAEkAQQBBAHQAQQBDAEEAQQBTAFEAQgB1AEEARwBRAEEAYQBRAEIAMgBBAEcAawBBAFoAQQBCADEAQQBHAEUAQQBiAEEAQQBnAEEARgBBAEEAYgB3AEIAeQBBAEgAUQBBAFoAZwBCAHYAQQBHAHcAQQBhAFEAQgB2AEEAQwBJAEEAQwBnAEIAaABBAEgAVQBBAGQAQQBCAG8AQQBHADgAQQBjAGcAQQA2AEEAQwBBAEEASQBnAEIATgBBAEcARQBBAFoAQQBCADUAQQBDAEkAQQBDAGcAQgBrAEEARwBFAEEAZABBAEIAbABBAEQAbwBBAEkAQQBBAGkAQQBFAEUAQQBjAEEAQgB5AEEARwBrAEEAYgBBAEEAZwBBAEQASQBBAE0AQQBBAHkAQQBEAFkAQQBJAGcAQQBLAEEARwA4AEEAZABRAEIAMABBAEgAQQBBAGQAUQBCADAAQQBEAG8AQQBJAEEAQgBvAEEASABRAEEAYgBRAEIAcwBBAEYAOABBAFoAQQBCAHYAQQBHAE0AQQBkAFEAQgB0AEEARwBVAEEAYgBnAEIAMABBAEEAbwBBAEwAUQBBAHQAQQBDADAAQQAKAHMAdQBmAGYAaQB4ADoA:31b8e172-b470-440e-83d8-e6b185028602
+
+# Project Overview
 
 This document represents my individual contribution to the project "Exploring Healthcare Access Disparities Through Data-Driven Visualization and Analysis." My primary responsibility was the Data Engineering and Processing of the 2021 baseline.
 
-
-#Madison Boyd Individual Contribution
+# Madison Boyd Individual Contribution
 
 Role: Data Cleaning, Structural Engineering, and Processing Logic (2021).
 
 My work focused on the complex deconstruction of six raw data files to create an efficient master dataset. This involved designing a modular cleaning pipeline, resolving schema inconsistencies, and executing a rigorous data type audit to ensure all socioeconomic and health variables were mathematically valid for analysis. All technical logic and processing steps presented here reflect my individual work in establishing the project's foundational dataset.
 
+# Data Cleaning and Processing Logic (2021)
 
-#Data Cleaning and Processing Logic (2021) 
+The 2021 analytical baseline was built using a modular cleaning pipeline. Since the County Health Rankings data is stored in specialized files, the method required a "Deconstruction and Extraction" approach to separate the metrics that are important for the project.
 
-The 2021 analytical baseline was built using a modular cleaning pipeline. Since the County Health Rankings data is stored in specialized files, the method required a "Deconstruction and Extraction" approach to separate the metrics that are important for the project. 
+# Ingestion of Socioeconomic Predictors (Files 1 & 2)
 
-#Ingestion of Socioeconomic Predictors (Files 1 & 2) 
-
-The first step involved processing the "Additional Measure Data" along with the metadata for this file. The main challenge was the presence of metadata headers in the raw CSV. This required using the skip = 1 argument to match the headers with the data rows. 
+The first step involved processing the "Additional Measure Data" along with the metadata for this file. The main challenge was the presence of metadata headers in the raw CSV. This required using the skip = 1 argument to match the headers with the data rows.
 
 ```{r clean_2021_file1}
 #Processing File 1: Additional Measure Data 
@@ -41,10 +35,9 @@ The first step involved processing the "Additional Measure Data" along with the 
 # Verification: Ensure Socioeconomic columns are present names(clean21_measures) 
 ```
 
+# Normalizing Health Rankings (Files 3 & 4)
 
-#Normalizing Health Rankings (Files 3 & 4) 
-
-Files 3 (Outcomes and Factors Rankings) and 4 (Outcomes and Factors SubRankings) gave the "calculated results" of the study. Because the raw files used generic headers like Rank and Rank.1, I used a Descriptive Renaming Strategy during selection to avoid variable collision when creating the final master join. 
+Files 3 (Outcomes and Factors Rankings) and 4 (Outcomes and Factors SubRankings) gave the "calculated results" of the study. Because the raw files used generic headers like Rank and Rank.1, I used a Descriptive Renaming Strategy during selection to avoid variable collision when creating the final master join.
 
 ```{r clean_2021_file3_4}
 # Processing File 3: Core Rankings 
@@ -55,26 +48,26 @@ clean21_ranked <- read.csv("data/raw/2021/Outcomes and Factors Rankings.csv", sk
 clean21_subranked <- read.csv("data/raw/2021/Outcomes and Factors SubRankings.csv", skip = 1) %>% dplyr::select(FIPS, Length_of_Life_Rank = Rank, Clinical_Care_Rank = Rank.3, Socioeconomic_Rank = Rank.4)
 ```
 
-#Isolating Racial Disparity Metrics (Files 5 & 6) 
+# Isolating Racial Disparity Metrics (Files 5 & 6)
 
-File 5 (Ranked Measure Data) had over 100 columns, including raw rates, confidence intervals, and data reliability flags. To keep the focus on racial equity, I used the contains() function to target the main Years of Potential Life Lost (YPLL) rates for Black and White populations while discarding secondary statistics. 
+File 5 (Ranked Measure Data) had over 100 columns, including raw rates, confidence intervals, and data reliability flags. To keep the focus on racial equity, I used the contains() function to target the main Years of Potential Life Lost (YPLL) rates for Black and White populations while discarding secondary statistics.
 
 ```{r clean_2021_file5}
  # Processing File 5: Targeted extraction of YPLL and Poor Health metrics clean21_rankedmeasures <- read.csv("data/raw/2021/Ranked Measure Data.csv", skip = 1) %>% dplyr::select(FIPS, YPLL_Rate = contains("Potential.Life.Lost.Rate"), YPLL_Black = contains("YPLL.Rate..Black"), YPLL_White = contains("YPLL.Rate..White"), Percent_Poor_Health = contains("Fair.or.Poor.Health")) %>% filter(!is.na(YPLL_Rate)) 
 
 ```
 
-#Relational Integration and Data Type Audit 
+# Relational Integration and Data Type Audit
 
-The last step of the 2021 method was a multi-stage Relational Join using the Federal Information Processing Standard (FIPS) codes as the main key. After the join, I did a Data Type Audit. Because raw CSVs often import numeric rankings as character strings due to alphanumeric placeholders like "NR" (Not Reported), I converted these to numeric doubles. 
+The last step of the 2021 method was a multi-stage Relational Join using the Federal Information Processing Standard (FIPS) codes as the main key. After the join, I did a Data Type Audit. Because raw CSVs often import numeric rankings as character strings due to alphanumeric placeholders like "NR" (Not Reported), I converted these to numeric doubles.
 
-
-# Synthesizing the 2021 Master Dataset 
+# Synthesizing the 2021 Master Dataset
 
 ```{r join_and_audit_2021}
 
 master_2021 <- clean21_measures %>% inner_join(clean21_ranked, by = "FIPS") %>% inner_join(clean21_subranked, by = "FIPS") %>% inner_join(clean21_rankedmeasures, by = "FIPS") # Auditing and forcing numeric types for mathematical validity master_2021$Median.Household.Income <- as.numeric(as.character(master_2021$Median.Household.Income)) master_2021$Health_Factors_Rank <- as.numeric(as.character(master_2021$Health_Factors_Rank)) master_2021$YPLL_Black <- as.numeric(as.character(master_2021$YPLL_Black)) master_2021$YPLL_White <- as.numeric(as.character(master_2021$YPLL_White)) # Listwise deletion of incomplete records master_2021 <- na.omit(master_2021) # Final Verification print(paste("Final 2021 County Count:", nrow(master_2021))) str(master_2021[c("Median.Household.Income", "YPLL_Black")])
 ```
+
 ---
 title: "CSC 308 Final Project - Individual Contribution"
 author: "Emmanuella Obidike"
@@ -99,7 +92,7 @@ This document represents my individual contribution to the group project titled 
 
 The goal of this analysis is to examine relationships between income, healthcare access, and health outcomes across U.S. counties. By analyzing these patterns, we can better understand how socioeconomic conditions influence healthcare quality and overall population health.
 
----
+------------------------------------------------------------------------
 
 # Individual Contribution - Emmanuella Obidike
 
@@ -109,20 +102,20 @@ For this project, I analyzed the cleaned 2021 dataset to identify patterns betwe
 
 All code and analysis presented in this document reflect my individual contribution.
 
----
+------------------------------------------------------------------------
 
 # Dataset Description
 
 The dataset used for this analysis is Master_2021_Cleaned.csv, which contains county-level data across the United States, including:
 
-* Median household income
-* Clinical care rankings
-* Health factors and health outcomes rankings
-* Demographic and health-related indicators
+-   Median household income
+-   Clinical care rankings
+-   Health factors and health outcomes rankings
+-   Demographic and health-related indicators
 
 The analysis uses the full dataset (all U.S. counties) to provide a nationwide perspective on healthcare disparities.
 
----
+------------------------------------------------------------------------
 
 # Summary Statistics
 
@@ -138,7 +131,7 @@ summary_table
 
 This summary provides an overall average of income and clinical care rankings across U.S. counties.
 
----
+------------------------------------------------------------------------
 
 # Visualization 1: Income vs Clinical Care
 
@@ -158,7 +151,7 @@ ggplot(data21, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
 
 This plot shows a negative relationship between income and clinical care rankings. Counties with higher median household income tend to have better (lower) clinical care rankings, suggesting that economic resources play a role in access to healthcare services.
 
----
+------------------------------------------------------------------------
 
 # Correlation: Income vs Clinical Care
 
@@ -176,7 +169,7 @@ correlation
 
 The correlation is negative, indicating that as income increases, clinical care rankings improve. This supports the idea that income is an important factor in healthcare access.
 
----
+------------------------------------------------------------------------
 
 # Visualization 2: Health Factors vs Health Outcomes
 
@@ -195,7 +188,7 @@ ggplot(data21, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
 
 There is a strong positive relationship between health factors and health outcomes. Counties with worse health factors tend to also have worse health outcomes, showing how environmental and behavioral conditions directly impact population health.
 
----
+------------------------------------------------------------------------
 
 # Correlation: Health Factors vs Outcomes
 
@@ -209,12 +202,11 @@ correlation2 <- cor(
 correlation2
 ```
 
-
 **Interpretation**
 
 The correlation is very strong, confirming that health factors are closely linked to health outcomes across counties.
 
----
+------------------------------------------------------------------------
 
 # Visualization 3: Income Distribution
 
@@ -229,12 +221,11 @@ ggplot(data21, aes(x = Median.Household.Income)) +
   theme_minimal()
 ```
 
-
 **Interpretation**
 
 Most counties fall within a middle-income range, with fewer counties at higher income levels, indicating a right-skewed distribution.
 
----
+------------------------------------------------------------------------
 
 # Visualization 4: Racial Disparities (YPLL)
 
@@ -257,7 +248,7 @@ ggplot(racial_data, aes(x = Group, y = YPLL, fill = Group)) +
 
 The plot shows noticeable differences in premature mortality between groups, suggesting disparities in health outcomes across populations.
 
----
+------------------------------------------------------------------------
 
 # Visualization 5: Income vs Health Outcomes
 
@@ -276,7 +267,7 @@ ggplot(data21, aes(x = Median.Household.Income, y = Health_Outcomes_Rank)) +
 
 Higher income is generally associated with better health outcomes, though there is still variability across counties.
 
----
+------------------------------------------------------------------------
 
 # Visualization 6: Clinical Care Distribution
 
@@ -295,7 +286,7 @@ ggplot(data21, aes(x = Clinical_Care_Rank)) +
 
 Clinical care rankings are concentrated at lower values (better rankings), with fewer counties having poor rankings.
 
----
+------------------------------------------------------------------------
 
 # Conclusion
 
@@ -307,20 +298,23 @@ These patterns highlight broader disparities in healthcare access across U.S. co
 
 Overall, this analysis demonstrates how exploratory data analysis can transform complex datasets into meaningful insights about public health disparities.
 
----
+------------------------------------------------------------------------
 
 # Final Statement
 
 All code and analysis in this document reflect my individual contribution to the project.
 
 # -------------------------------
+
 # Chloe Washington
+
 # Role: Implications of Results, Analytical Discussion, and Interpretation
+
 # -------------------------------
 
 This report supports the analytical discussion component of the group project. The goal is to examine what the project's findings mean in a real-world healthcare context — specifically, how income disparities across U.S. counties relate to clinical care quality, and how behavioral and environmental health factors connect to population health outcomes.
 
----
+------------------------------------------------------------------------
 
 ## Setup
 
@@ -331,7 +325,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Section 1: Load the Dataset (2021)
 
@@ -345,7 +339,7 @@ data21 <- master_2021
 head(data21)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Section 2: Use Full Dataset (All U.S. Counties)
 
@@ -356,7 +350,7 @@ No state-level filtering is applied here. The analysis reflects all U.S. countie
 filtered_data <- data21
 ```
 
----
+------------------------------------------------------------------------
 
 ## Section 3: Summary Table by State
 
@@ -375,7 +369,7 @@ summary_table
 
 > **Interpretation:** Differences in average income across states highlight regional disparities that may contribute to unequal healthcare access and outcomes. States with lower average incomes tend to cluster toward worse clinical care rankings, suggesting a systemic relationship between economic resources and healthcare quality.
 
----
+------------------------------------------------------------------------
 
 ## Section 4: Income vs. Clinical Care Rank (Scatter Plot)
 
@@ -395,7 +389,7 @@ ggplot(filtered_data, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) 
 
 > **Interpretation:** The scatter plot reveals a downward trend — as median household income increases, clinical care rank tends to decrease (i.e., improve). This pattern points to a meaningful association between a county's economic standing and the quality of clinical care available to its residents.
 
----
+------------------------------------------------------------------------
 
 ## Section 5: Correlation — Income and Clinical Care
 
@@ -413,7 +407,7 @@ cat("Correlation between income and clinical care rank:", round(correlation, 4))
 
 > **Interpretation:** The negative correlation confirms that counties with higher incomes tend to have better (lower-numbered) clinical care rankings. This suggests that economic resources may play a significant role in shaping access to and quality of healthcare services. Counties with fewer financial resources may face systemic barriers — such as fewer healthcare providers, reduced insurance coverage, and limited infrastructure — that translate directly into worse care outcomes.
 
----
+------------------------------------------------------------------------
 
 ## Section 6: Average Income by State (Bar Chart)
 
@@ -434,7 +428,7 @@ ggplot(summary_table, aes(x = reorder(State, avg_income), y = avg_income)) +
 
 > **Interpretation:** The bar chart makes visible the substantial income gap between states. States at the top of the chart — with higher average incomes — are generally located in the Northeast and West Coast, while lower-income states are concentrated in the South and rural Midwest. These geographic patterns mirror known disparities in healthcare infrastructure and outcomes, reinforcing the implication that place of residence is a strong predictor of healthcare access.
 
----
+------------------------------------------------------------------------
 
 ## Section 7: Health Factors vs. Health Outcomes
 
@@ -452,15 +446,15 @@ cat("Correlation between health factors and health outcomes rank:", round(correl
 
 > **Interpretation:** The strong positive correlation between health factors and health outcomes ranks indicates that counties with poorer underlying health conditions — such as high rates of smoking, obesity, or physical inactivity, combined with limited social and economic resources — also tend to experience worse overall health outcomes. This finding underscores the importance of upstream, preventive interventions that address root causes of poor health rather than focusing solely on clinical treatment after illness occurs.
 
----
+------------------------------------------------------------------------
 
 ## Conclusion
 
 The analyses presented in this report consistently point to a central theme: **economic and environmental conditions are deeply intertwined with healthcare access and population health**. Key takeaways include:
 
-- Counties and states with higher median household incomes tend to rank better in clinical care quality.
-- Geographic disparities in income map closely onto disparities in healthcare access, suggesting that place of birth and residence remains a major determinant of health equity.
-- Health factors — encompassing behavioral, environmental, and socioeconomic influences — are strongly correlated with health outcomes, reinforcing the case for holistic, community-level health policy interventions.
+-   Counties and states with higher median household incomes tend to rank better in clinical care quality.
+-   Geographic disparities in income map closely onto disparities in healthcare access, suggesting that place of birth and residence remains a major determinant of health equity.
+-   Health factors — encompassing behavioral, environmental, and socioeconomic influences — are strongly correlated with health outcomes, reinforcing the case for holistic, community-level health policy interventions.
 
 These findings have real policy implications: improving healthcare access in underserved areas may require addressing income inequality, expanding insurance coverage, investing in rural and low-income healthcare infrastructure, and targeting public health programs at the communities with the greatest need.
 
@@ -470,6 +464,7 @@ author: "Joshua"
 date: "April 2026"
 output: html_document
 ---
+
 This visualization explores the relationship between income and healthcare access. The results will show that lower income levels are associated with higher uninsured rates which portray that economic factors play a vital role in healthcare accessibility.
 
 This analysis supports the overall findings of the project because it shows how financial disparities influence health outcomes across different populations.
@@ -492,7 +487,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This section focuses on evaluating the reliability and quality of the dataset used in this project. The goal is to make sure the data is accurate, consistent, and appropriate for analysis while also considering ethical concerns.
 
----
+------------------------------------------------------------------------
 
 # Load Dataset
 
@@ -510,7 +505,7 @@ sum(is.na(master_2021))
 
 This step checks for missing data that could affect results or reduce representation of certain counties.
 
----
+------------------------------------------------------------------------
 
 # Duplicate Check
 
@@ -520,7 +515,7 @@ sum(duplicated(master_2021))
 
 Ensures there are no repeated rows that could bias the analysis.
 
----
+------------------------------------------------------------------------
 
 # Data Consistency
 
@@ -534,7 +529,7 @@ summary(master_2021$Median.Household.Income)
 
 This verifies that key variables like income contain valid values.
 
----
+------------------------------------------------------------------------
 
 # Summary of Key Variables
 
@@ -545,38 +540,37 @@ summary(master_2021 %>%
 
 Provides a general overview of how important variables are distributed.
 
----
+------------------------------------------------------------------------
 
 # Data Reliability
 
 The dataset comes from County Health Rankings, which uses sources like the CDC and U.S. Census Bureau. This makes the data generally reliable for analysis.
-  
----
+
+------------------------------------------------------------------------
 
 # Limitations and Bias
 
-* Data only covers one year (2021)
-* Missing values may affect some counties
-* Rural areas may be underrepresented
-* Reporting differences across regions may introduce bias
+-   Data only covers one year (2021)
+-   Missing values may affect some counties
+-   Rural areas may be underrepresented
+-   Reporting differences across regions may introduce bias
 
----
+------------------------------------------------------------------------
 
 # Ethical Considerations
 
-* Avoid misrepresenting groups
-* Do not generalize results to individuals
-* Be transparent about limitations
+-   Avoid misrepresenting groups
+-   Do not generalize results to individuals
+-   Be transparent about limitations
 
----
+------------------------------------------------------------------------
 
 # Conclusion
 
 The dataset is suitable for analysis, but it has some limitations and potential biases. These factors should be considered when interpreting the results.
 
----
+------------------------------------------------------------------------
 
 # Final Statement
 
 All validation, data quality checks, and ethical analysis in this document reflect my individual contribution to the project.
-
