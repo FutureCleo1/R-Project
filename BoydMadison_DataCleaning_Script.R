@@ -22,6 +22,37 @@ library(tidyverse)
 # ---------------------------------------------------------
 
 
+# -------------------------------
+# MADISON BOYD - DATA CLEANING & PREPROCESSING
+# -------------------------------
+
+# Load the required library for data cleaning
+library(dplyr)
+
+library(tidyverse)
+
+# Try current folder first
+if (!file.exists("raw_data")) {
+  
+  # Look for any folder that contains raw_data
+  possible_dirs <- list.dirs(".", recursive = FALSE)
+  
+  for (d in possible_dirs) {
+    if (file.exists(file.path(d, "raw_data"))) {
+      setwd(d)
+      break
+    }
+  }
+}
+# =========================================================
+# SECTION: 2021 DATA PREPARATION AND ANALYSIS
+# =========================================================
+
+# ---------------------------------------------------------
+# STEP 1: PROCESSING AND CLEANING 2021 DATA
+# ---------------------------------------------------------
+
+
 # --- FILE 1: Additional Measure Data ---
 # skipped the first placeholder row told R to treat "N/A" as a missing value
 data21_measures <- read.csv("raw_data/2021/AdditionalMeasureData.csv", 
