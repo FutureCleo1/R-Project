@@ -302,205 +302,171 @@ Overall, this analysis demonstrates how exploratory data analysis can transform 
 
 All code and analysis in this document reflect my individual contribution to the project.
 
----
-title: "CSC 308 Final Project - Individual Portfolio"
-author: "Chloe"
-date: "April 2026"
-output: html_document
----
-  
-  ```
-{r setup, include=FALSE}
+# -------------------------------
+# Chloe Washington
+# Role: Implications of Results, Analytical Discussion, and Interpretation
+# -------------------------------
+
+# This script examines what the project findings mean in a real-world
+# healthcare context. Using the full 2021 County Health Rankings dataset,
+# the analysis focuses on the relationship between economic conditions and
+# healthcare access, and the connection between health factors and outcomes.
+# No state filtering is applied — all results reflect the national picture.
+
 library(dplyr)
 library(ggplot2)
-```
 
-# Introduction
+# ---------------------------------------------------------
+# SECTION 1: Load the cleaned dataset (2021)
+# ---------------------------------------------------------
 
-For this project, my role focused on **discussing the implications of the results and explaining why the findings matter**.  
-Instead of mainly creating the exploratory analysis, my contribution centered on interpreting the significance of the patterns found in the data and connecting them to real-world healthcare access issues.
+data21        <- master_2021
+filtered_data <- data21  # No state filtering; reflects all U.S. counties
 
-The purpose of my analysis was to explain how the project’s findings relate to healthcare inequality, differences across communities, and the broader importance of socioeconomic and health-related conditions.
+head(data21)
 
----
-  
-  # Dataset and Preparation
-  
-  I used the cleaned 2021 project dataset:
-  
-  `processed_data/2021/Master_2021_Cleaned.csv`
+# ---------------------------------------------------------
+# SECTION 2: State-Level Summary Table
+# Discussion: Income Disparities Across States
+# ---------------------------------------------------------
 
-The analysis focused on the following states:
-  
-  - Virginia  
-- North Carolina  
-- Maryland  
-- Georgia  
-- Florida  
+# Grouping by state reveals substantial variation in average county income.
+# States in the Northeast and Pacific regions tend to report higher averages,
+# while many Southern and rural Midwestern states cluster at the lower end.
+# Because clinical care rank is closely tied to income, states with
+# persistently low incomes are also likely to show worse healthcare access.
 
-```{r}
-data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
-
-states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")
-
-filtered_data <- data21 %>%
-  filter(State %in% states)
-
-head(filtered_data)
-```
-
----
-  
-  # Summary Statistics
-  
-  I first reviewed summary statistics to support discussion of the project findings.
-
-```{r}
 summary_table <- filtered_data %>%
   group_by(State) %>%
   summarise(
-    avg_income = mean(Median.Household.Income, na.rm = TRUE),
-    avg_clinical_rank = mean(Clinical_Care_Rank, na.rm = TRUE)
+    avg_income        = mean(Median.Household.Income, na.rm = TRUE),
+    avg_clinical_rank = mean(Clinical_Care_Rank,      na.rm = TRUE)
   )
 
-summary_table
-```
+print("Summary table (average values by state):")
+print(summary_table)
+print("Interpretation: Differences in average income across states highlight")
+print("regional disparities that contribute to unequal healthcare access.")
+print("Federal funding formulas that account for state-level income averages")
+print("may better address where healthcare need is greatest.")
 
-## Discussion
+# ---------------------------------------------------------
+# SECTION 3: Plot 1 - Income vs Clinical Care (Nationwide)
+# Discussion: Economic Resources as a Predictor of Healthcare Access
+# ---------------------------------------------------------
 
-This summary helps show that the selected states differ in both income and clinical care rankings.  
-These differences matter because they suggest that economic conditions may shape the quality of healthcare access available in different communities.
+# The scatter plot reveals a clear negative trend: as income rises, clinical
+# care rank improves (rank number decreases). This suggests wealthier counties
+# are more likely to have greater provider availability, higher insurance rates,
+# and more robust public health infrastructure. Lower-income counties face
+# compounding disadvantages that create a feedback loop between economic
+# hardship and poor health outcomes.
 
-The results also show that healthcare disparities are not evenly distributed. Some states appear to have stronger average conditions than others, which may reflect broader differences in resources, provider availability, and community health support.
-
----
-  
-  # Visualization: Income vs Clinical Care
-  
-  ```{r}
 ggplot(filtered_data, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
   geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
   labs(
-    title = "Income vs Clinical Care (2021)",
-    x = "Median Household Income",
-    y = "Clinical Care Rank"
+    title = "Income vs Clinical Care Across U.S. Counties (2021)",
+    x     = "Median Household Income",
+    y     = "Clinical Care Rank (Lower = Better)"
   ) +
   theme_minimal()
-```
 
-## Discussion
+# ---------------------------------------------------------
+# SECTION 4: Correlation - Income vs Clinical Care
+# ---------------------------------------------------------
 
-This plot suggests that counties with higher household income tend to have better clinical care rankings.  
-Because lower ranking values indicate better clinical care, the pattern implies that wealthier counties may have advantages in healthcare access and quality.
-
-This has important implications. It suggests that healthcare access is connected to economic inequality. Communities with fewer financial resources may also face greater difficulty accessing providers, services, and other forms of care.
-
-In a real-world sense, this means healthcare differences are not only medical issues. They are also social and economic issues.
-
----
-  
-  # Correlation: Income vs Clinical Care
-  
-  ```{r}
 correlation <- cor(
   filtered_data$Median.Household.Income,
   filtered_data$Clinical_Care_Rank,
   use = "complete.obs"
 )
 
-correlation
-```
+print("Correlation between income and clinical care:")
+print(correlation)
+print("Interpretation: The negative correlation confirms that counties with")
+print("higher income tend to have better clinical care rankings. Economic")
+print("resources are a meaningful predictor of healthcare access. Targeted")
+print("investment in low-income counties — such as federally qualified health")
+print("centers and Medicaid expansion — could help close this access gap.")
 
-## Discussion
+# ---------------------------------------------------------
+# SECTION 5: Plot 2 - Average Income by State
+# Discussion: Visualizing Regional Disparities
+# ---------------------------------------------------------
 
-The correlation is negative, which supports the idea that higher income is associated with better clinical care rankings.
+# This bar chart makes state-level income divides immediately visible,
+# providing a useful framework for identifying where systemic intervention
+# is most needed. States at the bottom of the distribution consistently
+# appear in analyses of poor health outcomes and limited clinical access.
 
-This result matters because it strengthens the visual pattern shown in the scatter plot.  
-It suggests that income may play a meaningful role in shaping healthcare access across counties.
-
-The implication of this finding is that improving healthcare equity may require more than expanding medical services alone. It may also require attention to larger economic inequalities.
-
----
-  
-  # Visualization: Average Income by State
-  
-  ```{r}
-ggplot(summary_table, aes(x = State, y = avg_income)) +
-  geom_col() +
+ggplot(summary_table, aes(x = reorder(State, avg_income), y = avg_income)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
   labs(
-    title = "Average Income by State (2021)",
-    x = "State",
-    y = "Average Income"
+    title = "Average Median Household Income by State (2021)",
+    x     = "State",
+    y     = "Average Income ($)"
   ) +
   theme_minimal()
-```
 
-## Discussion
+# ---------------------------------------------------------
+# SECTION 6: Correlation - Health Factors vs Health Outcomes
+# Discussion: Social Determinants Drive Population Health
+# ---------------------------------------------------------
 
-This state comparison shows that average income is not the same across the selected states.  
-Some states have noticeably higher average income than others.
+# Health Factors (a composite of behavioral, socioeconomic, and environmental
+# conditions) are strongly correlated with Health Outcomes (a composite of
+# current population health). Counties that rank poorly on health factors
+# also tend to rank poorly on health outcomes. This reinforces a core
+# public health principle: the conditions in which people live, work, and
+# age are the primary drivers of population health — not just clinical care.
+# Addressing social determinants (housing, food access, education) is
+# central to healthcare policy, not separate from it.
 
-This is important because differences in income may help explain why healthcare rankings are also uneven.  
-If income shapes access to insurance, transportation, providers, and preventive care, then economic differences may contribute to long-term health disparities across regions.
-
----
-  
-  # Correlation: Health Factors vs Health Outcomes
-  
-  ```{r}
 correlation2 <- cor(
   filtered_data$Health_Factors_Rank,
   filtered_data$Health_Outcomes_Rank,
   use = "complete.obs"
 )
 
-correlation2
-```
+print("Correlation between health factors and health outcomes:")
+print(correlation2)
+print("Interpretation: The strong positive correlation across thousands of")
+print("counties is a powerful argument for preventive, community-level")
+print("interventions rather than exclusively focusing on acute clinical care.")
 
-## Discussion
+# ---------------------------------------------------------
+# SECTION 7: Limitations and Cautions
+# ---------------------------------------------------------
 
-The relationship between health factors and health outcomes is very strong.  
-This means counties with weaker health-related conditions also tend to have poorer overall health outcomes.
+print("--- LIMITATIONS ---")
+print("1. Correlation is not causation. Higher income does not directly cause")
+print("   better outcomes; both may reflect shared conditions like education")
+print("   levels or geographic proximity to resources.")
+print("2. County-level aggregation can mask within-county disparities. A")
+print("   high-income county may still contain pockets of significant poverty.")
+print("3. Single-year snapshot: the 2021 dataset captures one point in time.")
+print("   Trends, policy impacts, and pandemic effects may not be fully captured.")
+print("4. Suppressed data: counties with missing/unreliable values were removed")
+print("   during cleaning, which may underrepresent rural or sparse areas.")
 
-This finding has a broader implication for public health. It suggests that healthcare outcomes are shaped by more than treatment alone. Social and environmental conditions also matter.
+# ---------------------------------------------------------
+# SECTION 8: Conclusion
+# ---------------------------------------------------------
 
-Because of this, policies that focus only on hospitals or medical care may not be enough. Improving health outcomes may also require investments in the larger conditions that affect people’s daily lives.
-
----
-  
-  # Real-World Implications
-  
-  The results of this project suggest several important implications:
-  
-  - Economic inequality may contribute to unequal healthcare access  
-- Better clinical care is often connected to stronger financial conditions  
-- Health outcomes are influenced by broader health factors, not only medical care  
-- Communities with weaker support conditions may face long-term disadvantages in health and healthcare access  
-
-These findings matter because they show that healthcare disparities are part of a larger structural issue.  
-This means that solving healthcare inequality likely requires both medical improvements and attention to larger social and economic conditions.
-
----
-  
-  # Limitations
-  
-  Although the results are meaningful, there are still some limitations.
-
-First, rankings and summary values do not capture every detail about the healthcare experience of individuals.  
-Second, correlation does not prove causation. Even though the relationships are strong, the data does not prove that one variable directly causes the other.  
-Finally, the analysis focuses on selected states and one cleaned dataset, so the findings should be interpreted within that scope.
-
----
-  
-  # Conclusion
-  
-  My contribution to this project focused on discussing the meaning and significance of the results.  
-The analysis suggests that differences in income, clinical care, and health-related conditions are closely connected.
-
-Overall, these results show that healthcare access disparities are tied to larger patterns of inequality.  
-This makes the findings important not only for data analysis, but also for understanding real-world healthcare challenges.
-
----
+print("--- CONCLUSION ---")
+print("This analysis provides strong evidence that economic inequality and")
+print("healthcare access are deeply intertwined. Counties with lower median")
+print("household incomes consistently rank worse on both clinical care access")
+print("and overall health outcomes. The structural conditions that shape health")
+print("are tightly coupled with actual population health status.")
+print("These findings describe real disparities affecting millions of Americans")
+print("who, by virtue of their zip code and income level, face systematically")
+print("worse health prospects. Responsible use of this data means translating")
+print("these correlations into advocacy for equitable resource distribution,")
+print("evidence-based policy reform, and sustained investment in the communities")
+print("that need it most.")
   
   # Individual Contribution
   
