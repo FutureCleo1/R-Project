@@ -1,5 +1,5 @@
 ---
-Name: Mady Boyd, Emmanuella Obidike, Chloe Washington
+Name: Mady Boyd, Emmanuella Obidike, Chloe Washington, Sidney Cerami, Joshua Hall
 title: "R Notebook"
 output: html_notebook
 ---
@@ -489,4 +489,110 @@ output: html_document
 This visualization explores the relationship between income and healthcare access. The results will show that lower income levels are associated with higher uninsured rates which portray that economic factors play a vital role in healthcare accessibility.
 
 This analysis supports the overall findings of the project because it shows how financial disparities influence health outcomes across different populations.
+
+---
+title: "SidneyCerami_Validation_Markdown"
+author: "Sidney Cerami"
+date: "2026-04-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Individual Contribution - Sidney Cerami
+
+**Role:** Validation, Data Quality, and Ethics Analysis
+
+This section focuses on evaluating the reliability and quality of the dataset used in this project. The goal is to make sure the data is accurate, consistent, and appropriate for analysis while also considering ethical concerns.
+
+---
+
+# Load Dataset
+
+```{r}
+master_2021 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
+dim(master_2021)
+```
+
+# Missing Values Check
+
+```{r}
+colSums(is.na(master_2021))
+sum(is.na(master_2021))
+```
+
+This step checks for missing data that could affect results or reduce representation of certain counties.
+
+---
+
+# Duplicate Check
+
+```{r}
+sum(duplicated(master_2021))
+```
+
+Ensures there are no repeated rows that could bias the analysis.
+
+---
+
+# Data Consistency
+
+```{r}
+invalid_income <- master_2021 %>%
+  filter(Median.Household.Income < 0)
+
+nrow(invalid_income)
+summary(master_2021$Median.Household.Income)
+```
+
+This verifies that key variables like income contain valid values.
+
+---
+
+# Summary of Key Variables
+
+```{r}
+summary(master_2021 %>%
+          select(Median.Household.Income, Life.Expectancy))
+```
+
+Provides a general overview of how important variables are distributed.
+
+---
+
+# Data Reliability
+
+The dataset comes from County Health Rankings, which uses sources like the CDC and U.S. Census Bureau. This makes the data generally reliable for analysis.
+  
+---
+
+# Limitations and Bias
+
+* Data only covers one year (2021)
+* Missing values may affect some counties
+* Rural areas may be underrepresented
+* Reporting differences across regions may introduce bias
+
+---
+
+# Ethical Considerations
+
+* Avoid misrepresenting groups
+* Do not generalize results to individuals
+* Be transparent about limitations
+
+---
+
+# Conclusion
+
+The dataset is suitable for analysis, but it has some limitations and potential biases. These factors should be considered when interpreting the results.
+
+---
+
+# Final Statement
+
+All validation, data quality checks, and ethical analysis in this document reflect my individual contribution to the project.
 
