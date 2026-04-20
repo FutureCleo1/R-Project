@@ -6,12 +6,12 @@ library(dplyr)
 library(ggplot2)
 
 # Load Dataset
-data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
+data21 <- read.csv("Master_2021_Cleaned.csv")
 
 # --- Visualization 1: Income vs Uninsured ----
-ggplot(data21, aes(x = Median.Household.Income, y = Uninsured)) + 
+ggplot(data21, aes(x = Median.Household.Income, y = X..Uninsured)) + 
   geom_point(alpha = 0.5, color = "blue") + 
-  lab(
+  labs(
     title = "Income vs Uninsured Rate",
     x = "Median Household Income",
     y = "Uninsured Percentage"
@@ -19,11 +19,11 @@ ggplot(data21, aes(x = Median.Household.Income, y = Uninsured)) +
   theme_minimal()
 
 # --- Visualization 2: Rural vs Healthcare Access ---
-ggplot(data21, aes(x = Rural_Percentage, y = Clinical_Care_Rank)) +
+ggplot(data21, aes(x = X..Rural, y = Clinical_Care_Rank)) +
   geom_point(alpha = 0.5, color = "red") +
   labs(
       title = "Rural Population vs Clinical Care",
-      x = "Rural Population %"
+      x = "X..Rural %",
       y = "Clincal Care Rank"
   ) +
   theme_minimal()
