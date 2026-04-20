@@ -6,7 +6,7 @@ library(dplyr)
 library(ggplot2)
 
 # Load Dataset
-data21 <- read.csv("Master_2021_Cleaned.csv")
+data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
 
 # --- Visualization 1: Income vs Uninsured ----
 ggplot(data21, aes(x = Median.Household.Income, y = X..Uninsured)) + 
