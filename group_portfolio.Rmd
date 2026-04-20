@@ -77,7 +77,7 @@ library(ggplot2)
 library(tidyr)
 knitr::opts_chunk$set(echo = TRUE)
 
-# Load dataset and filter selected states
+# Load dataset
 master_2021 <- read.csv("Master_2021_Cleaned.csv")
 data21 <- master_2021
 ```
