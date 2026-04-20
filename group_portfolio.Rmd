@@ -1,5 +1,5 @@
 ---
-Name: Mady Boyd, Emmanuella Obidike, Chloe Washingotn
+Name: Mady Boyd, Emmanuella Obidike, Chloe Washington
 title: "R Notebook"
 output: html_notebook
 ---
@@ -74,16 +74,19 @@ output: html_document
 ```{r setup, include=FALSE}
 library(dplyr)
 library(ggplot2)
+library(tidyr)
 knitr::opts_chunk$set(echo = TRUE)
+
+# Load dataset and filter selected states
+master_2021 <- read.csv("Master_2021_Cleaned.csv")
+data21 <- master_2021
 ```
 
 # Project Overview
 
-This document represents my individual contribution to the group project titled Exploring Healthcare Access Disparities Through Data-Driven Visualization and Analysis. My work focuses specifically on exploratory data analysis and interpretation using the cleaned 2021 dataset.
+This document represents my individual contribution to the group project titled Exploring Healthcare Access Disparities Through Data-Driven Visualization and Analysis. My work focuses on exploratory data analysis (EDA) and interpretation using the cleaned 2021 dataset.
 
-This project examines relationships between income, healthcare access, and health outcomes using county-level data. The analysis focuses on identifying patterns between economic factors and overall health rankings across selected states.
-
-The dataset includes measures such as median household income, clinical care rankings, and health factors/outcomes indicators. The goal of the project is to understand how socioeconomic conditions influence healthcare quality and population health.
+The goal of this analysis is to examine relationships between income, healthcare access, and health outcomes across U.S. counties. By analyzing these patterns, we can better understand how socioeconomic conditions influence healthcare quality and overall population health.
 
 ---
 
@@ -91,49 +94,29 @@ The dataset includes measures such as median household income, clinical care ran
 
 **Role:** Exploratory Data Analysis (EDA), Statistical Analysis, and Interpretation
 
-For this project, I was responsible for analyzing the cleaned 2021 dataset to explore relationships between income, healthcare access, and health outcomes. My work included filtering the dataset, generating summary statistics, creating visualizations, performing correlation analysis, and interpreting key patterns observed in the data.
+For this project, I analyzed the cleaned 2021 dataset to identify patterns between income levels, clinical care access, and health outcomes. My work included generating summary statistics, creating visualizations, performing correlation analysis, and interpreting key findings.
 
-All analysis and code presented in this document reflect my individual contribution to the overall team project.
+All code and analysis presented in this document reflect my individual contribution.
 
 ---
 
-# Dataset and Preparation
+# Dataset Description
 
-I used the cleaned dataset `Master_2021_Cleaned.csv`, which contains county-level data including:
+The dataset used for this analysis is Master_2021_Cleaned.csv, which contains county-level data across the United States, including:
 
-- Median household income  
-- Clinical care rankings  
-- Health factors and health outcomes rankings  
-- Demographic and health-related variables  
+* Median household income
+* Clinical care rankings
+* Health factors and health outcomes rankings
+* Demographic and health-related indicators
 
-To stay consistent with the project focus, I filtered the dataset to the following states:
-
-- Virginia  
-- North Carolina  
-- Maryland  
-- Georgia  
-- Florida  
-
-```{r}
-# Load dataset and filter selected states
-data21 <- read.csv("processed_data/2021/Master_2021_Cleaned.csv")
-states <- c("Virginia", "North Carolina", "Maryland", "Georgia", "Florida")
-
-filtered_data <- data21 %>%
-  filter(State %in% states)
-
-
-```
-
-The analysis focuses on these states to provide a regional comparison of healthcare access and socioeconomic differences across diverse geographic areas.
+The analysis uses the full dataset (all U.S. counties) to provide a nationwide perspective on healthcare disparities.
 
 ---
 
 # Summary Statistics
 
 ```{r}
-summary_table <- filtered_data %>%
-  group_by(State) %>%
+summary_table <- data21 %>%
   summarise(
     avg_income = mean(Median.Household.Income, na.rm = TRUE),
     avg_clinical_rank = mean(Clinical_Care_Rank, na.rm = TRUE)
@@ -142,46 +125,27 @@ summary_table <- filtered_data %>%
 summary_table
 ```
 
-This provides a quick comparison of income and clinical care differences across states
+This summary provides an overall average of income and clinical care rankings across U.S. counties.
 
 ---
 
 # Visualization 1: Income vs Clinical Care
 
 ```{r}
-ggplot(filtered_data, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
-  geom_point(color = "blue", alpha = 0.4) +
+ggplot(data21, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
+  geom_point(color = "blue", alpha = 0.3) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
   labs(
-    title = "Income vs Clinical Care (2021)",
+    title = "Income vs Clinical Care Across U.S. Counties (2021)",
     x = "Median Household Income",
-    y = "Clinical Care Rank"
+    y = "Clinical Care Rank (Lower = Better)"
   ) +
   theme_minimal()
 ```
 
 **Interpretation**
 
-This scatter plot shows a clear negative relationship between income and clinical care ranking. 
-As income increases, clinical care rank tends to improve (lower rank = better care).
-
----
-
-# Visualization 2: Average Income by State
-
-```{r}
-ggplot(summary_table, aes(x = State, y = avg_income)) +
-  geom_col(fill = "purple") +
-  labs(
-    title = "Average Income by State (2021)",
-    x = "State",
-    y = "Average Income"
-  ) +
-  theme_minimal()
-```
-
-**Interpretation**
-
-Maryland exhibits the highest average income among the selected states, while Georgia and North Carolina show comparatively lower income levels.
+This plot shows a negative relationship between income and clinical care rankings. Counties with higher median household income tend to have better (lower) clinical care rankings, suggesting that economic resources play a role in access to healthcare services.
 
 ---
 
@@ -189,8 +153,8 @@ Maryland exhibits the highest average income among the selected states, while Ge
 
 ```{r}
 correlation <- cor(
-  filtered_data$Median.Household.Income,
-  filtered_data$Clinical_Care_Rank,
+  data21$Median.Household.Income,
+  data21$Clinical_Care_Rank,
   use = "complete.obs"
 )
 
@@ -199,26 +163,26 @@ correlation
 
 **Interpretation**
 
-The correlation is about -0.48, showing a moderate negative relationship, indicating that higher income is associated with better (lower) clinical care rankings.
+The correlation is negative, indicating that as income increases, clinical care rankings improve. This supports the idea that income is an important factor in healthcare access.
 
 ---
 
-# Visualization 3: Health Factors vs Health Outcomes
+# Visualization 2: Health Factors vs Health Outcomes
 
 ```{r}
-ggplot(filtered_data, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
-  geom_point(alpha = 0.4, color = "darkgreen") +
+ggplot(data21, aes(x = Health_Factors_Rank, y = Health_Outcomes_Rank)) +
+  geom_point(alpha = 0.3, color = "darkgreen") +
   labs(
-    title = "Health Factors vs Health Outcomes",
-    x = "Health Factors Rank",
-    y = "Health Outcomes Rank"
+    title = "Health Factors vs Health Outcomes Across U.S. Counties (2021)",
+    x = "Health Factors Rank (Lower = Better)",
+    y = "Health Outcomes Rank (Lower = Better)"
   ) +
   theme_minimal()
 ```
 
 **Interpretation**
 
-This suggests that counties with poorer health factors tend to have worse health outcomes, indicating a strong relationship between environmental conditions and overall population health.
+There is a strong positive relationship between health factors and health outcomes. Counties with worse health factors tend to also have worse health outcomes, showing how environmental and behavioral conditions directly impact population health.
 
 ---
 
@@ -226,35 +190,117 @@ This suggests that counties with poorer health factors tend to have worse health
 
 ```{r}
 correlation2 <- cor(
-  filtered_data$Health_Factors_Rank,
-  filtered_data$Health_Outcomes_Rank,
+  data21$Health_Factors_Rank,
+  data21$Health_Outcomes_Rank,
   use = "complete.obs"
 )
 
 correlation2
 ```
 
+
 **Interpretation**
 
-The correlation is about 0.91, which is very strong.
+The correlation is very strong, confirming that health factors are closely linked to health outcomes across counties.
+
+---
+
+# Visualization 3: Income Distribution
+
+```{r}
+ggplot(data21, aes(x = Median.Household.Income)) +
+  geom_histogram(fill = "purple", bins = 30, alpha = 0.7) +
+  labs(
+    title = "Distribution of Median Household Income (U.S. Counties, 2021)",
+    x = "Median Household Income",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+
+**Interpretation**
+
+Most counties fall within a middle-income range, with fewer counties at higher income levels, indicating a right-skewed distribution.
+
+---
+
+# Visualization 4: Racial Disparities (YPLL)
+
+```{r}
+racial_data <- data21 %>%
+  select(YPLL_Black, YPLL_White) %>%
+  pivot_longer(cols = everything(), names_to = "Group", values_to = "YPLL")
+
+ggplot(racial_data, aes(x = Group, y = YPLL, fill = Group)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(
+    title = "Racial Disparities in Premature Mortality (YPLL)",
+    x = "Population Group",
+    y = "YPLL Rate"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+The plot shows noticeable differences in premature mortality between groups, suggesting disparities in health outcomes across populations.
+
+---
+
+# Visualization 5: Income vs Health Outcomes
+
+```{r}
+ggplot(data21, aes(x = Median.Household.Income, y = Health_Outcomes_Rank)) +
+  geom_point(alpha = 0.3, color = "darkred") +
+  labs(
+    title = "Income vs Health Outcomes Across U.S. Counties (2021)",
+    x = "Median Household Income",
+    y = "Health Outcomes Rank"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+Higher income is generally associated with better health outcomes, though there is still variability across counties.
+
+---
+
+# Visualization 6: Clinical Care Distribution
+
+```{r}
+ggplot(data21, aes(x = Clinical_Care_Rank)) +
+  geom_histogram(fill = "blue", bins = 30, alpha = 0.7) +
+  labs(
+    title = "Distribution of Clinical Care Rankings",
+    x = "Clinical Care Rank",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+**Interpretation**
+
+Clinical care rankings are concentrated at lower values (better rankings), with fewer counties having poor rankings.
 
 ---
 
 # Conclusion
 
-The analysis reveals clear relationships between socioeconomic factors and healthcare access.
+The analysis reveals clear relationships between socioeconomic conditions and healthcare access.
 
-Higher income levels are generally associated with better clinical care rankings, suggesting that economic stability plays a key role in access to healthcare resources. Also, the strong relationship between health factors and health outcomes indicates that environmental and behavioral conditions significantly influence overall population health.
+Higher income levels are associated with better clinical care rankings, suggesting that financial resources influence access to healthcare services. Additionally, the strong relationship between health factors and health outcomes shows that environmental and behavioral conditions play a major role in overall population health.
 
-Differences observed across states highlight how geographic and demographic variations contribute to disparities in healthcare access. These findings emphasize the importance of addressing socioeconomic inequalities in order to improve healthcare accessibility and outcomes.
+These patterns highlight broader disparities in healthcare access across U.S. counties
 
-Overall, this project shows how exploratory analysis can help turn complex healthcare data into insights that are easier to understand.  
-
-These findings directly support the broader project goal of identifying disparities in healthcare access and understanding how socioeconomic factors contribute to differences in health outcomes.
+Overall, this analysis demonstrates how exploratory data analysis can transform complex datasets into meaningful insights about public health disparities.
 
 ---
+
 # Final Statement
-All code in this document reflects my individual contribution.
+
+All code and analysis in this document reflect my individual contribution to the project.
 
 ---
 title: "CSC 308 Final Project - Individual Portfolio"
