@@ -24,11 +24,11 @@ Role: Data Cleaning, Structural Engineering, and Processing Logic (2021).
 My work focused on the complex deconstruction of six raw data files to create an efficient master dataset. This involved designing a modular cleaning pipeline, resolving schema inconsistencies, and executing a rigorous data type audit to ensure all socioeconomic and health variables were mathematically valid for analysis. All technical logic and processing steps presented here reflect my individual work in establishing the project's foundational dataset.
 
 
-#4.1 Data Cleaning and Processing Logic (2021) 
+#Data Cleaning and Processing Logic (2021) 
 
 The 2021 analytical baseline was built using a modular cleaning pipeline. Since the County Health Rankings data is stored in specialized files, the method required a "Deconstruction and Extraction" approach to separate the metrics that are important for the project. 
 
-#4.1.1 Ingestion of Socioeconomic Predictors (Files 1 & 2) 
+#Ingestion of Socioeconomic Predictors (Files 1 & 2) 
 
 The first step involved processing the "Additional Measure Data" along with the metadata for this file. The main challenge was the presence of metadata headers in the raw CSV. This required using the skip = 1 argument to match the headers with the data rows. 
 
@@ -42,7 +42,7 @@ The first step involved processing the "Additional Measure Data" along with the 
 ```
 
 
-#4.1.2 Normalizing Health Rankings (Files 3 & 4) 
+#Normalizing Health Rankings (Files 3 & 4) 
 
 Files 3 (Outcomes and Factors Rankings) and 4 (Outcomes and Factors SubRankings) gave the "calculated results" of the study. Because the raw files used generic headers like Rank and Rank.1, I used a Descriptive Renaming Strategy during selection to avoid variable collision when creating the final master join. 
 
@@ -55,7 +55,7 @@ clean21_ranked <- read.csv("data/raw/2021/Outcomes and Factors Rankings.csv", sk
 clean21_subranked <- read.csv("data/raw/2021/Outcomes and Factors SubRankings.csv", skip = 1) %>% dplyr::select(FIPS, Length_of_Life_Rank = Rank, Clinical_Care_Rank = Rank.3, Socioeconomic_Rank = Rank.4)
 ```
 
-#4.1.3 Isolating Racial Disparity Metrics (Files 5 & 6) 
+#Isolating Racial Disparity Metrics (Files 5 & 6) 
 
 File 5 (Ranked Measure Data) had over 100 columns, including raw rates, confidence intervals, and data reliability flags. To keep the focus on racial equity, I used the contains() function to target the main Years of Potential Life Lost (YPLL) rates for Black and White populations while discarding secondary statistics. 
 
@@ -64,7 +64,7 @@ File 5 (Ranked Measure Data) had over 100 columns, including raw rates, confiden
 
 ```
 
-#4.1.4 Relational Integration and Data Type Audit 
+#Relational Integration and Data Type Audit 
 
 The last step of the 2021 method was a multi-stage Relational Join using the Federal Information Processing Standard (FIPS) codes as the main key. After the join, I did a Data Type Audit. Because raw CSVs often import numeric rankings as character strings due to alphanumeric placeholders like "NR" (Not Reported), I converted these to numeric doubles. 
 
@@ -318,178 +318,151 @@ All code and analysis in this document reflect my individual contribution to the
 # Role: Implications of Results, Analytical Discussion, and Interpretation
 # -------------------------------
 
-# This script examines what the project findings mean in a real-world
-# healthcare context. Using the full 2021 County Health Rankings dataset,
-# the analysis focuses on the relationship between economic conditions and
-# healthcare access, and the connection between health factors and outcomes.
-# No state filtering is applied — all results reflect the national picture.
+This report supports the analytical discussion component of the group project. The goal is to examine what the project's findings mean in a real-world healthcare context — specifically, how income disparities across U.S. counties relate to clinical care quality, and how behavioral and environmental health factors connect to population health outcomes.
 
+---
+
+## Setup
+
+Load the required libraries for data manipulation and visualization.
+
+```{r libraries}
 library(dplyr)
 library(ggplot2)
+```
 
-# ---------------------------------------------------------
-# SECTION 1: Load the cleaned dataset (2021)
-# ---------------------------------------------------------
+---
 
-data21        <- master_2021
-filtered_data <- data21  # No state filtering; reflects all U.S. counties
+## Section 1: Load the Dataset (2021)
 
+We begin by loading the cleaned 2021 dataset created earlier in the project pipeline.
+
+```{r load-data}
+# Use the cleaned dataset created earlier in the project
+data21 <- master_2021
+
+# Quick check that the data loaded correctly
 head(data21)
+```
 
-# ---------------------------------------------------------
-# SECTION 2: State-Level Summary Table
-# Discussion: Income Disparities Across States
-# ---------------------------------------------------------
+---
 
-# Grouping by state reveals substantial variation in average county income.
-# States in the Northeast and Pacific regions tend to report higher averages,
-# while many Southern and rural Midwestern states cluster at the lower end.
-# Because clinical care rank is closely tied to income, states with
-# persistently low incomes are also likely to show worse healthcare access.
+## Section 2: Use Full Dataset (All U.S. Counties)
 
+No state-level filtering is applied here. The analysis reflects all U.S. counties to ensure the findings are nationally representative.
+
+```{r full-dataset}
+# No filtering applied — analysis reflects all states
+filtered_data <- data21
+```
+
+---
+
+## Section 3: Summary Table by State
+
+The table below shows the average median household income and average clinical care rank for each state. This provides a high-level view of regional variation in both economic conditions and healthcare quality.
+
+```{r summary-table}
 summary_table <- filtered_data %>%
   group_by(State) %>%
   summarise(
     avg_income        = mean(Median.Household.Income, na.rm = TRUE),
-    avg_clinical_rank = mean(Clinical_Care_Rank,      na.rm = TRUE)
+    avg_clinical_rank = mean(Clinical_Care_Rank, na.rm = TRUE)
   )
 
-print("Summary table (average values by state):")
-print(summary_table)
-print("Interpretation: Differences in average income across states highlight")
-print("regional disparities that contribute to unequal healthcare access.")
-print("Federal funding formulas that account for state-level income averages")
-print("may better address where healthcare need is greatest.")
+summary_table
+```
 
-# ---------------------------------------------------------
-# SECTION 3: Plot 1 - Income vs Clinical Care (Nationwide)
-# Discussion: Economic Resources as a Predictor of Healthcare Access
-# ---------------------------------------------------------
+> **Interpretation:** Differences in average income across states highlight regional disparities that may contribute to unequal healthcare access and outcomes. States with lower average incomes tend to cluster toward worse clinical care rankings, suggesting a systemic relationship between economic resources and healthcare quality.
 
-# The scatter plot reveals a clear negative trend: as income rises, clinical
-# care rank improves (rank number decreases). This suggests wealthier counties
-# are more likely to have greater provider availability, higher insurance rates,
-# and more robust public health infrastructure. Lower-income counties face
-# compounding disadvantages that create a feedback loop between economic
-# hardship and poor health outcomes.
+---
 
+## Section 4: Income vs. Clinical Care Rank (Scatter Plot)
+
+The scatter plot below visualizes the relationship between median household income and clinical care rank at the county level across the United States in 2021.
+
+```{r scatter-plot}
 ggplot(filtered_data, aes(x = Median.Household.Income, y = Clinical_Care_Rank)) +
-  geom_point(alpha = 0.4) +
-  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  geom_point(alpha = 0.4, color = "#2C7BB6") +
   labs(
-    title = "Income vs Clinical Care Across U.S. Counties (2021)",
-    x     = "Median Household Income",
-    y     = "Clinical Care Rank (Lower = Better)"
+    title    = "Income vs. Clinical Care Across U.S. Counties (2021)",
+    subtitle = "Each point represents one U.S. county",
+    x        = "Median Household Income",
+    y        = "Clinical Care Rank (Lower = Better)"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 13)
+```
 
-# ---------------------------------------------------------
-# SECTION 4: Correlation - Income vs Clinical Care
-# ---------------------------------------------------------
+> **Interpretation:** The scatter plot reveals a downward trend — as median household income increases, clinical care rank tends to decrease (i.e., improve). This pattern points to a meaningful association between a county's economic standing and the quality of clinical care available to its residents.
 
+---
+
+## Section 5: Correlation — Income and Clinical Care
+
+To quantify the relationship observed in the scatter plot, we compute the Pearson correlation coefficient between median household income and clinical care rank.
+
+```{r correlation-income-care}
 correlation <- cor(
   filtered_data$Median.Household.Income,
   filtered_data$Clinical_Care_Rank,
   use = "complete.obs"
 )
 
-print("Correlation between income and clinical care:")
-print(correlation)
-print("Interpretation: The negative correlation confirms that counties with")
-print("higher income tend to have better clinical care rankings. Economic")
-print("resources are a meaningful predictor of healthcare access. Targeted")
-print("investment in low-income counties — such as federally qualified health")
-print("centers and Medicaid expansion — could help close this access gap.")
+cat("Correlation between income and clinical care rank:", round(correlation, 4))
+```
 
-# ---------------------------------------------------------
-# SECTION 5: Plot 2 - Average Income by State
-# Discussion: Visualizing Regional Disparities
-# ---------------------------------------------------------
+> **Interpretation:** The negative correlation confirms that counties with higher incomes tend to have better (lower-numbered) clinical care rankings. This suggests that economic resources may play a significant role in shaping access to and quality of healthcare services. Counties with fewer financial resources may face systemic barriers — such as fewer healthcare providers, reduced insurance coverage, and limited infrastructure — that translate directly into worse care outcomes.
 
-# This bar chart makes state-level income divides immediately visible,
-# providing a useful framework for identifying where systemic intervention
-# is most needed. States at the bottom of the distribution consistently
-# appear in analyses of poor health outcomes and limited clinical access.
+---
 
+## Section 6: Average Income by State (Bar Chart)
+
+The bar chart below ranks all U.S. states by their average county-level median household income, providing a geographic view of economic inequality.
+
+```{r bar-chart-income}
 ggplot(summary_table, aes(x = reorder(State, avg_income), y = avg_income)) +
-  geom_col(fill = "steelblue") +
+  geom_col(fill = "#4DAF4A") +
   coord_flip() +
   labs(
-    title = "Average Median Household Income by State (2021)",
-    x     = "State",
-    y     = "Average Income ($)"
+    title    = "Average Median Household Income by State (2021)",
+    subtitle = "Based on county-level averages",
+    x        = "State",
+    y        = "Average Income ($)"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 11)
+```
 
-# ---------------------------------------------------------
-# SECTION 6: Correlation - Health Factors vs Health Outcomes
-# Discussion: Social Determinants Drive Population Health
-# ---------------------------------------------------------
+> **Interpretation:** The bar chart makes visible the substantial income gap between states. States at the top of the chart — with higher average incomes — are generally located in the Northeast and West Coast, while lower-income states are concentrated in the South and rural Midwest. These geographic patterns mirror known disparities in healthcare infrastructure and outcomes, reinforcing the implication that place of residence is a strong predictor of healthcare access.
 
-# Health Factors (a composite of behavioral, socioeconomic, and environmental
-# conditions) are strongly correlated with Health Outcomes (a composite of
-# current population health). Counties that rank poorly on health factors
-# also tend to rank poorly on health outcomes. This reinforces a core
-# public health principle: the conditions in which people live, work, and
-# age are the primary drivers of population health — not just clinical care.
-# Addressing social determinants (housing, food access, education) is
-# central to healthcare policy, not separate from it.
+---
 
+## Section 7: Health Factors vs. Health Outcomes
+
+Finally, we examine whether a county's overall health factors (behavioral, environmental, and social determinants) are associated with its health outcomes (length and quality of life).
+
+```{r correlation-health}
 correlation2 <- cor(
   filtered_data$Health_Factors_Rank,
   filtered_data$Health_Outcomes_Rank,
   use = "complete.obs"
 )
 
-print("Correlation between health factors and health outcomes:")
-print(correlation2)
-print("Interpretation: The strong positive correlation across thousands of")
-print("counties is a powerful argument for preventive, community-level")
-print("interventions rather than exclusively focusing on acute clinical care.")
+cat("Correlation between health factors and health outcomes rank:", round(correlation2, 4))
+```
 
-# ---------------------------------------------------------
-# SECTION 7: Limitations and Cautions
-# ---------------------------------------------------------
+> **Interpretation:** The strong positive correlation between health factors and health outcomes ranks indicates that counties with poorer underlying health conditions — such as high rates of smoking, obesity, or physical inactivity, combined with limited social and economic resources — also tend to experience worse overall health outcomes. This finding underscores the importance of upstream, preventive interventions that address root causes of poor health rather than focusing solely on clinical treatment after illness occurs.
 
-print("--- LIMITATIONS ---")
-print("1. Correlation is not causation. Higher income does not directly cause")
-print("   better outcomes; both may reflect shared conditions like education")
-print("   levels or geographic proximity to resources.")
-print("2. County-level aggregation can mask within-county disparities. A")
-print("   high-income county may still contain pockets of significant poverty.")
-print("3. Single-year snapshot: the 2021 dataset captures one point in time.")
-print("   Trends, policy impacts, and pandemic effects may not be fully captured.")
-print("4. Suppressed data: counties with missing/unreliable values were removed")
-print("   during cleaning, which may underrepresent rural or sparse areas.")
+---
 
-# ---------------------------------------------------------
-# SECTION 8: Conclusion
-# ---------------------------------------------------------
+## Conclusion
 
-print("--- CONCLUSION ---")
-print("This analysis provides strong evidence that economic inequality and")
-print("healthcare access are deeply intertwined. Counties with lower median")
-print("household incomes consistently rank worse on both clinical care access")
-print("and overall health outcomes. The structural conditions that shape health")
-print("are tightly coupled with actual population health status.")
-print("These findings describe real disparities affecting millions of Americans")
-print("who, by virtue of their zip code and income level, face systematically")
-print("worse health prospects. Responsible use of this data means translating")
-print("these correlations into advocacy for equitable resource distribution,")
-print("evidence-based policy reform, and sustained investment in the communities")
-print("that need it most.")
-  
-  # Individual Contribution
-  
-  For this project, I was responsible for:
-  
-  - Explaining the significance of the project results  
-- Discussing the implications of relationships found in the data  
-- Connecting findings to real-world healthcare inequality  
-- Supporting discussion with summary statistics, visualizations, and correlations  
-- Reflecting on limitations and broader meaning of the results  
+The analyses presented in this report consistently point to a central theme: **economic and environmental conditions are deeply intertwined with healthcare access and population health**. Key takeaways include:
 
-All code in this document reflects my individual contribution to the project.
+- Counties and states with higher median household incomes tend to rank better in clinical care quality.
+- Geographic disparities in income map closely onto disparities in healthcare access, suggesting that place of birth and residence remains a major determinant of health equity.
+- Health factors — encompassing behavioral, environmental, and socioeconomic influences — are strongly correlated with health outcomes, reinforcing the case for holistic, community-level health policy interventions.
+
+These findings have real policy implications: improving healthcare access in underserved areas may require addressing income inequality, expanding insurance coverage, investing in rural and low-income healthcare infrastructure, and targeting public health programs at the communities with the greatest need.
 
 ---
 title: "CSC 308 Final Project - Individual Portfolio"
